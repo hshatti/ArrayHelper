@@ -1,0 +1,451 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CONFIG>
+  <ProjectSession>
+    <PathDelim Value="\"/>
+    <Version Value="11"/>
+    <BuildModes Active="Default"/>
+    <Units Count="38">
+      <Unit0>
+        <Filename Value="BLASTest.lpr"/>
+        <IsPartOfProject Value="True"/>
+        <CursorPos X="26" Y="14"/>
+        <UsageCount Value="201"/>
+        <Loaded Value="True"/>
+      </Unit0>
+      <Unit1>
+        <Filename Value="blas_u.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="Form1"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <EditorIndex Value="12"/>
+        <CursorPos X="22" Y="1631"/>
+        <UsageCount Value="201"/>
+        <Loaded Value="True"/>
+        <LoadedDesigner Value="True"/>
+      </Unit1>
+      <Unit2>
+        <Filename Value="text.cpp"/>
+        <IsPartOfProject Value="True"/>
+        <EditorIndex Value="20"/>
+        <CursorPos X="115" Y="7"/>
+        <UsageCount Value="316"/>
+        <Loaded Value="True"/>
+        <DefaultSyntaxHighlighter Value="C++"/>
+      </Unit2>
+      <Unit3>
+        <Filename Value="mkl.inc"/>
+        <IsPartOfProject Value="True"/>
+        <EditorIndex Value="8"/>
+        <TopLine Value="36"/>
+        <CursorPos X="76" Y="36"/>
+        <UsageCount Value="579"/>
+        <Loaded Value="True"/>
+      </Unit3>
+      <Unit4>
+        <Filename Value="steroids.pas"/>
+        <IsPartOfProject Value="True"/>
+        <EditorIndex Value="13"/>
+        <TopLine Value="160"/>
+        <CursorPos X="37" Y="175"/>
+        <UsageCount Value="250"/>
+        <Loaded Value="True"/>
+      </Unit4>
+      <Unit5>
+        <Filename Value="arrayhelper.pas"/>
+        <UnitName Value="ArrayHelper"/>
+        <EditorIndex Value="14"/>
+        <TopLine Value="792"/>
+        <CursorPos X="64" Y="814"/>
+        <UsageCount Value="107"/>
+        <Loaded Value="True"/>
+      </Unit5>
+      <Unit6>
+        <Filename Value="ahdefines.inc"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="21"/>
+        <CursorPos X="97" Y="17"/>
+        <UsageCount Value="100"/>
+        <Loaded Value="True"/>
+      </Unit6>
+      <Unit7>
+        <Filename Value="arrayfloatimp.inc"/>
+        <EditorIndex Value="23"/>
+        <TopLine Value="39"/>
+        <CursorPos X="69" Y="64"/>
+        <UsageCount Value="100"/>
+        <Loaded Value="True"/>
+      </Unit7>
+      <Unit8>
+        <Filename Value="oprs_simd.pas"/>
+        <EditorIndex Value="19"/>
+        <TopLine Value="5089"/>
+        <CursorPos X="53" Y="5363"/>
+        <UsageCount Value="100"/>
+        <Loaded Value="True"/>
+      </Unit8>
+      <Unit9>
+        <Filename Value="arraynumh.inc"/>
+        <EditorIndex Value="17"/>
+        <CursorPos X="54" Y="18"/>
+        <UsageCount Value="100"/>
+        <Loaded Value="True"/>
+      </Unit9>
+      <Unit10>
+        <Filename Value="arraynumimp.inc"/>
+        <EditorIndex Value="18"/>
+        <CursorPos X="69" Y="23"/>
+        <UsageCount Value="100"/>
+        <Loaded Value="True"/>
+      </Unit10>
+      <Unit11>
+        <Filename Value="hirestimer.pas"/>
+        <EditorIndex Value="16"/>
+        <TopLine Value="29"/>
+        <CursorPos X="7" Y="45"/>
+        <UsageCount Value="152"/>
+        <Loaded Value="True"/>
+      </Unit11>
+      <Unit12>
+        <Filename Value="arrayfloath.inc"/>
+        <EditorIndex Value="22"/>
+        <CursorPos X="53" Y="20"/>
+        <UsageCount Value="130"/>
+        <Loaded Value="True"/>
+      </Unit12>
+      <Unit13>
+        <Filename Value="openblas.pp"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="76"/>
+        <CursorPos X="5" Y="94"/>
+        <UsageCount Value="65"/>
+      </Unit13>
+      <Unit14>
+        <Filename Value="dnn.pas"/>
+        <EditorIndex Value="11"/>
+        <TopLine Value="355"/>
+        <CursorPos X="43" Y="360"/>
+        <UsageCount Value="108"/>
+        <Loaded Value="True"/>
+      </Unit14>
+      <Unit15>
+        <Filename Value="mkl_blas.pp"/>
+        <EditorIndex Value="9"/>
+        <TopLine Value="3577"/>
+        <CursorPos X="3" Y="3591"/>
+        <UsageCount Value="107"/>
+        <Loaded Value="True"/>
+      </Unit15>
+      <Unit16>
+        <Filename Value="mkl_cblas.pp"/>
+        <EditorIndex Value="5"/>
+        <CursorPos X="103" Y="138"/>
+        <UsageCount Value="107"/>
+        <Loaded Value="True"/>
+      </Unit16>
+      <Unit17>
+        <Filename Value="mkl_types.pp"/>
+        <EditorIndex Value="10"/>
+        <TopLine Value="53"/>
+        <CursorPos X="5" Y="76"/>
+        <UsageCount Value="103"/>
+        <Loaded Value="True"/>
+      </Unit17>
+      <Unit18>
+        <Filename Value="C:\lazarus\fpc\3.2.0\source\rtl\objpas\objpas.pp"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="18"/>
+        <CursorPos X="8" Y="35"/>
+        <UsageCount Value="4"/>
+      </Unit18>
+      <Unit19>
+        <Filename Value="arrayhelpercommon.pas"/>
+        <UnitName Value="ArrayHelperCommon"/>
+        <EditorIndex Value="4"/>
+        <TopLine Value="176"/>
+        <CursorPos X="42" Y="34"/>
+        <UsageCount Value="300"/>
+        <Loaded Value="True"/>
+      </Unit19>
+      <Unit20>
+        <Filename Value="G:\usr\local\share\fpcsrc\packages\univint\src\vDSP.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="3063"/>
+        <CursorPos X="11" Y="3084"/>
+        <UsageCount Value="250"/>
+      </Unit20>
+      <Unit21>
+        <Filename Value="mkl_blas_64.pp"/>
+        <EditorIndex Value="7"/>
+        <CursorPos X="126" Y="12"/>
+        <UsageCount Value="283"/>
+        <Loaded Value="True"/>
+      </Unit21>
+      <Unit22>
+        <Filename Value="G:\usr\local\share\fpcsrc\rtl\inc\systemh.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="771"/>
+        <CursorPos X="14" Y="786"/>
+        <UsageCount Value="234"/>
+      </Unit22>
+      <Unit23>
+        <Filename Value="complexarray.pas"/>
+        <EditorIndex Value="1"/>
+        <TopLine Value="976"/>
+        <CursorPos X="77" Y="412"/>
+        <UsageCount Value="277"/>
+        <Loaded Value="True"/>
+      </Unit23>
+      <Unit24>
+        <Filename Value="G:\usr\local\share\fpcsrc\rtl\inc\system.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="744"/>
+        <CursorPos X="24" Y="759"/>
+        <UsageCount Value="232"/>
+      </Unit24>
+      <Unit25>
+        <Filename Value="complexarrayh.inc"/>
+        <EditorIndex Value="2"/>
+        <TopLine Value="37"/>
+        <CursorPos X="24" Y="91"/>
+        <UsageCount Value="113"/>
+        <Loaded Value="True"/>
+      </Unit25>
+      <Unit26>
+        <Filename Value="complexarrayimp.inc"/>
+        <EditorIndex Value="3"/>
+        <TopLine Value="78"/>
+        <CursorPos X="30" Y="100"/>
+        <UsageCount Value="113"/>
+        <Loaded Value="True"/>
+      </Unit26>
+      <Unit27>
+        <Filename Value="mkl_vml.pp"/>
+        <EditorIndex Value="15"/>
+        <TopLine Value="207"/>
+        <CursorPos X="11" Y="221"/>
+        <UsageCount Value="133"/>
+        <Loaded Value="True"/>
+      </Unit27>
+      <Unit28>
+        <Filename Value="mkl_dfti.pp"/>
+        <EditorIndex Value="6"/>
+        <CursorPos X="73" Y="19"/>
+        <UsageCount Value="132"/>
+        <Loaded Value="True"/>
+      </Unit28>
+      <Unit29>
+        <Filename Value="E:\usr\local\share\fpcsrc\rtl\inc\cgeneric.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="26"/>
+        <CursorPos X="3" Y="29"/>
+        <UsageCount Value="64"/>
+      </Unit29>
+      <Unit30>
+        <Filename Value="E:\usr\local\share\fpcsrc\rtl\darwin\ptypes.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="39"/>
+        <CursorPos X="5" Y="62"/>
+        <UsageCount Value="64"/>
+      </Unit30>
+      <Unit31>
+        <Filename Value="E:\usr\local\share\fpcsrc\rtl\bsd\ostypes.inc"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="17" Y="24"/>
+        <UsageCount Value="122"/>
+      </Unit31>
+      <Unit32>
+        <Filename Value="E:\usr\local\share\fpcsrc\rtl\bsd\sysos.inc"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="7" Y="20"/>
+        <UsageCount Value="129"/>
+      </Unit32>
+      <Unit33>
+        <Filename Value="E:\usr\local\share\fpcsrc\rtl\unix\oscdeclh.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="137"/>
+        <UsageCount Value="129"/>
+      </Unit33>
+      <Unit34>
+        <Filename Value="E:\usr\local\share\fpcsrc\rtl\bsd\osmacro.inc"/>
+        <EditorIndex Value="-1"/>
+        <UsageCount Value="129"/>
+      </Unit34>
+      <Unit35>
+        <Filename Value="E:\usr\local\share\fpcsrc\rtl\objpas\math.pp"/>
+        <UnitName Value="Math"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="1757"/>
+        <CursorPos X="6" Y="1759"/>
+        <UsageCount Value="29"/>
+      </Unit35>
+      <Unit36>
+        <Filename Value="E:\usr\local\share\fpcsrc\rtl\inc\genmath.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="64"/>
+        <CursorPos X="10" Y="158"/>
+        <UsageCount Value="29"/>
+      </Unit36>
+      <Unit37>
+        <Filename Value="..\..\..\..\usr\local\share\fpcsrc\rtl\objpas\objpas.pp"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="145"/>
+        <CursorPos X="8" Y="35"/>
+        <UsageCount Value="8"/>
+      </Unit37>
+    </Units>
+    <JumpHistory Count="30" HistoryIndex="29">
+      <Position1>
+        <Filename Value="arrayhelper.pas"/>
+        <Caret Line="496" Column="141" TopLine="482"/>
+      </Position1>
+      <Position2>
+        <Filename Value="arrayhelper.pas"/>
+        <Caret Line="383" Column="156" TopLine="362"/>
+      </Position2>
+      <Position3>
+        <Filename Value="arrayfloatimp.inc"/>
+        <Caret Line="891" Column="60" TopLine="123"/>
+      </Position3>
+      <Position4>
+        <Filename Value="arrayhelper.pas"/>
+        <Caret Line="382" Column="156" TopLine="1011"/>
+      </Position4>
+      <Position5>
+        <Filename Value="arrayhelper.pas"/>
+        <Caret Line="464" Column="127" TopLine="442"/>
+      </Position5>
+      <Position6>
+        <Filename Value="arrayhelper.pas"/>
+        <Caret Line="914" TopLine="881"/>
+      </Position6>
+      <Position7>
+        <Filename Value="arrayhelper.pas"/>
+        <Caret Line="240" Column="62" TopLine="216"/>
+      </Position7>
+      <Position8>
+        <Filename Value="arrayhelper.pas"/>
+        <Caret Line="391" Column="156" TopLine="367"/>
+      </Position8>
+      <Position9>
+        <Filename Value="arrayhelper.pas"/>
+        <Caret Line="240" Column="14" TopLine="217"/>
+      </Position9>
+      <Position10>
+        <Filename Value="arrayhelper.pas"/>
+        <Caret Line="239" Column="14" TopLine="239"/>
+      </Position10>
+      <Position11>
+        <Filename Value="ahdefines.inc"/>
+        <Caret Line="17" Column="20"/>
+      </Position11>
+      <Position12>
+        <Filename Value="arrayhelper.pas"/>
+        <Caret Line="239" Column="18" TopLine="239"/>
+      </Position12>
+      <Position13>
+        <Filename Value="arrayhelper.pas"/>
+        <Caret Line="242" Column="14" TopLine="238"/>
+      </Position13>
+      <Position14>
+        <Filename Value="arrayhelper.pas"/>
+        <Caret Line="239" Column="27" TopLine="238"/>
+      </Position14>
+      <Position15>
+        <Filename Value="arrayfloath.inc"/>
+        <Caret Line="20" Column="68"/>
+      </Position15>
+      <Position16>
+        <Filename Value="arrayfloatimp.inc"/>
+        <Caret Line="60" Column="39" TopLine="38"/>
+      </Position16>
+      <Position17>
+        <Filename Value="arrayfloatimp.inc"/>
+        <Caret Line="62" Column="41" TopLine="39"/>
+      </Position17>
+      <Position18>
+        <Filename Value="arrayhelper.pas"/>
+        <Caret Line="812" Column="42" TopLine="782"/>
+      </Position18>
+      <Position19>
+        <Filename Value="arraynumh.inc"/>
+        <Caret Line="18" Column="135"/>
+      </Position19>
+      <Position20>
+        <Filename Value="arraynumimp.inc"/>
+        <Caret Line="23" Column="33"/>
+      </Position20>
+      <Position21>
+        <Filename Value="arraynumh.inc"/>
+        <Caret Line="18" Column="13"/>
+      </Position21>
+      <Position22>
+        <Filename Value="arraynumimp.inc"/>
+        <Caret Line="23" Column="34" TopLine="4"/>
+      </Position22>
+      <Position23>
+        <Filename Value="arraynumimp.inc"/>
+        <Caret Line="28" Column="132" TopLine="4"/>
+      </Position23>
+      <Position24>
+        <Filename Value="arrayhelper.pas"/>
+        <Caret Line="812" Column="42" TopLine="782"/>
+      </Position24>
+      <Position25>
+        <Filename Value="arrayhelper.pas"/>
+        <Caret Line="240" Column="14" TopLine="218"/>
+      </Position25>
+      <Position26>
+        <Filename Value="arraynumimp.inc"/>
+        <Caret Line="23" Column="138"/>
+      </Position26>
+      <Position27>
+        <Filename Value="arraynumh.inc"/>
+        <Caret Line="18" Column="126"/>
+      </Position27>
+      <Position28>
+        <Filename Value="ahdefines.inc"/>
+        <Caret Line="17" Column="98"/>
+      </Position28>
+      <Position29>
+        <Filename Value="arrayhelper.pas"/>
+        <Caret Line="240" Column="55" TopLine="218"/>
+      </Position29>
+      <Position30>
+        <Filename Value="ahdefines.inc"/>
+        <Caret Line="17" Column="84"/>
+      </Position30>
+    </JumpHistory>
+    <RunParams>
+      <FormatVersion Value="2"/>
+      <Modes Count="0" ActiveMode=""/>
+    </RunParams>
+  </ProjectSession>
+  <Debugging>
+    <BreakPoints Count="3">
+      <Item1>
+        <Kind Value="bpkAddress"/>
+        <Address Value="12554837"/>
+        <WatchScope Value="wpsLocal"/>
+        <WatchKind Value="wpkWrite"/>
+      </Item1>
+      <Item2>
+        <Kind Value="bpkAddress"/>
+        <Address Value="12554856"/>
+        <WatchScope Value="wpsLocal"/>
+        <WatchKind Value="wpkWrite"/>
+      </Item2>
+      <Item3>
+        <Kind Value="bpkAddress"/>
+        <Address Value="12547685"/>
+        <WatchScope Value="wpsLocal"/>
+        <WatchKind Value="wpkWrite"/>
+      </Item3>
+    </BreakPoints>
+    <Watches Count="1">
+      <Item1>
+        <Expression Value="NN"/>
+      </Item1>
+    </Watches>
+  </Debugging>
+</CONFIG>
