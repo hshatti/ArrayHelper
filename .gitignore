@@ -74,6 +74,7 @@ BLASTest
 *.tgz
 *.dmg
 *.pdf
+.DS_Store
 
 
 # Delphi history and backups
@@ -85,7 +86,6 @@ lib/
 *.app/
 *.dSYM/
 dmat090/
-ArrayTest/
 SineWaveGen/
 
 # Castalia statistics file (since XE7 Castalia is distributed with Delphi)
