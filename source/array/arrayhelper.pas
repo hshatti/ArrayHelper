@@ -20,7 +20,6 @@ uses
   {$ifdef USE_AVX2}, oprs_simd {$endif}
   //{$ifdef USE_AVX2}, pblas {$endif}
   {$ifdef USE_GPU}, oprs_gpu {$endif}
-  {$ifdef USE_THREADS},steroids{$endif}
   {$ifdef USE_OPENBLAS}, openblas {$endif}
   //{$ifdef Darwin},vDSP{$endif}
   //,dnn

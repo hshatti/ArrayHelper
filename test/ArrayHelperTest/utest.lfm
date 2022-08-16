@@ -1,19 +1,18 @@
 object Form1: TForm1
   Left = 720
-  Height = 1171
+  Height = 762
   Top = 198
-  Width = 1466
+  Width = 1117
   Caption = 'Form1'
-  ClientHeight = 1171
-  ClientWidth = 1466
+  ClientHeight = 762
+  ClientWidth = 1117
   OnCreate = FormCreate
-  LCLVersion = '2.0.12.0'
   Scaled = False
   object Memo1: TMemo
     Left = 0
-    Height = 940
-    Top = 231
-    Width = 1466
+    Height = 400
+    Top = 362
+    Width = 1117
     Align = alBottom
     Font.CharSet = ANSI_CHARSET
     Font.Color = clCaptionText
@@ -21,7 +20,7 @@ object Form1: TForm1
     Font.Name = 'Andale Mono'
     Font.Pitch = fpFixed
     Lines.Strings = (
-      'dfgdfg'
+      'Output..'
     )
     ParentFont = False
     ScrollBars = ssAutoVertical
@@ -31,44 +30,34 @@ object Form1: TForm1
     Left = 12
     Height = 28
     Top = 20
-    Width = 92
-    Caption = 'Button1'
+    Width = 188
+    Caption = 'Regression Example'
     OnClick = Button1Click
     TabOrder = 1
   end
   object Edit1: TEdit
-    Left = 124
-    Height = 40
+    Left = 212
+    Height = 22
     Top = 24
     Width = 156
-    OnKeyDown = Edit1KeyDown
     TabOrder = 2
     Text = 'Edit1'
   end
   object Image1: TImage
-    Left = 844
-    Height = 364
+    Left = 496
+    Height = 348
     Top = 8
     Width = 614
     Stretch = True
   end
   object BitBtn1: TBitBtn
-    Left = 20
+    Left = 12
     Height = 30
     Top = 68
     Width = 75
     Caption = 'Test All'
     OnClick = BitBtn1Click
     TabOrder = 3
-  end
-  object BitBtn2: TBitBtn
-    Left = 128
-    Height = 30
-    Top = 68
-    Width = 75
-    Caption = 'BitBtn2'
-    OnClick = BitBtn2Click
-    TabOrder = 4
   end
   object BitBtn3: TBitBtn
     Left = 20
@@ -77,7 +66,7 @@ object Form1: TForm1
     Width = 105
     Caption = 'BitBtn3'
     OnClick = BitBtn3Click
-    TabOrder = 5
+    TabOrder = 4
   end
   object Button2: TButton
     Left = 136
@@ -86,7 +75,7 @@ object Form1: TForm1
     Width = 192
     Caption = 'Activate Buffer'
     OnClick = Button2Click
-    TabOrder = 6
+    TabOrder = 5
   end
   object Button3: TButton
     Left = 153
@@ -94,16 +83,23 @@ object Form1: TForm1
     Top = 176
     Width = 84
     Caption = 'Play'
-    OnClick = Button3Click
-    TabOrder = 7
+    TabOrder = 6
   end
   object Splitter1: TSplitter
     Cursor = crVSplit
     Left = 0
-    Height = 5
-    Top = 226
-    Width = 1466
+    Height = 9
+    Top = 353
+    Width = 1117
     Align = alBottom
     ResizeAnchor = akBottom
+  end
+  object BitBtn2: TBitBtn
+    Left = 128
+    Height = 30
+    Top = 68
+    Width = 75
+    Caption = 'BitBtn2'
+    TabOrder = 8
   end
 end

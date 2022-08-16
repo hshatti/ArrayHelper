@@ -18,7 +18,7 @@ uses
   Classes, Types, SysUtils, Math,ArrayHelperCommon{$ifdef use_lcl_complex},ucomplex{$endif}
   {$ifdef USE_AVX2},oprs_simd{$endif}
   //{$ifdef USE_AVX2},pblas{$endif}
-  {$ifdef USE_THREADS},oprs_multithread{$endif};
+  ;
 
 {$i ahdefines.inc}
 type

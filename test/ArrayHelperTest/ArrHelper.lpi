@@ -63,7 +63,7 @@
           <SearchPaths>
             <IncludeFiles Value="$(ProjOutDir)"/>
             <Libraries Value="/opt/intel/oneapi/mkl/2022.0.0/lib/"/>
-            <OtherUnitFiles Value="../VideoCapture"/>
+            <OtherUnitFiles Value="../../source/array;../../source/highrestimer;../../source/quickchart;../../source/steroids;../../source/intel_mkl;../../source/ml"/>
             <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
           </SearchPaths>
           <CodeGeneration>

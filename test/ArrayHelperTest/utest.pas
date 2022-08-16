@@ -6,11 +6,17 @@ interface
 
 uses
   Classes, SysUtils, StrUtils, Forms, Controls, Types, StdCtrls, Graphics,
-  Dialogs, ExtCtrls, Buttons, tensors, ArrayHelperCommon, arrayhelper,
-  math, quickchart, MediaFileReader, HiResTimer, complexarray
-  {$ifdef USE_AVX2}, oprs_simd{$endif}
+  Dialogs, ExtCtrls, Buttons, math,
+
+  tensors ,
+  ArrayHelperCommon ,
+  arrayhelper ,
+  complexarray ,
+
   //{$ifdef USE_AVX2}, pblas {$endif}
   {$ifdef darwin}{$endif}
+  quickchart,
+  HiResTimer
 
   ;
 
@@ -29,12 +35,9 @@ type
     Memo1: TMemo;
     Splitter1: TSplitter;
     procedure BitBtn1Click(Sender: TObject);
-    procedure BitBtn2Click(Sender: TObject);
     procedure BitBtn3Click(Sender: TObject);
     procedure Button1Click(Sender: TObject);
     procedure Button2Click(Sender: TObject);
-    procedure Button3Click(Sender: TObject);
-    procedure Edit1KeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure FormCreate(Sender: TObject);
   private
 
@@ -391,29 +394,12 @@ begin
   //plot.ShowPlot;
 end;
 
-procedure TForm1.Button3Click(Sender: TObject);
-var T1,T2,R:TSingleTensor; t:QWord;
-begin
-
-  T1.Init(TSingles.Uniform(1000000,10.0,-10.0),[1000,1000]);
-  T2.Init(TSingles.Uniform(1000000,10.0,-10.0),[1000,1000]);
-  t:=HighResTimer.MicroSeconds;
-  R:=T1.Multiply(T2);
-  t:=HighResTimer.MicroSeconds-t;
-  Memo1.Lines.Add('Multiply took [%.0n]µs Hash %n',[t+0.0,TSingles(R.Data).Sum]);
-end;
-
 procedure TForm1.BitBtn1Click(Sender: TObject);
 var i:integer;
 begin
   Memo1.Lines.Clear;
 
   Memo1.Lines.Add(dotest(0));//
-end;
-
-procedure TForm1.BitBtn2Click(Sender: TObject);
-begin
-  Memo1.Lines.Add(dotest(1));
 end;
 
 function RGBA(const r,g,b,a:byte):longword; inline;
@@ -507,7 +493,7 @@ begin
   Memo1.Lines.Add('%n elements '#13#10'max     (simd) of ar : is [%.5n] took [%.0n]µs',[ar.count+0.0, a, t+0.0]);
   Memo1.Lines.Add('%n elements '#13#10'max  (normal) of ar : is [%.5n] took [%.0n]µs',[ar.count+0.0,  b,  t0+0.0]);
 //  Memo1.Lines.Add('%n elements '#13#10'Sum     (normal) of dr : is [%.5n] took [%.0n]µs',[dr.count.ToSingle,  ss,  t1.ToSingle]);
-  exit;
+//  exit;
   //Memo1.Lines.Add('complex test [%s]',[ctest]);
 
   px:=png.ScanLine[0];
@@ -543,30 +529,6 @@ begin
   t:=HighResTimer.MicroSeconds-t;
   Image1.Picture.Graphic:=png;
   Memo1.Lines.add('Mandelbrot[640 X 480] Iteration[%d] took [%.0n]µs',[iter,t+0.0]);
-end;
-
-procedure TForm1.Edit1KeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
-var vv:TStringArray;f1,f2,f3,f4,f5:extended;isfrac:boolean;
-begin
-//
-//  if key=13  then begin
-//    vv:=string(Edit1.Text).split(',');
-//    f1:=vv[0];
-//    if length(vv)>1 then
-//        f2:=vv[1]
-//    else
-//        f2:=2;
-//
-//    memo1.lines.add(FloatToStr(RoundTo(f1,trunc(-f2))));
-//
-//    exit;
-//    if Length(vv)>1 then
-//      Memo1.Lines.Add(plot.alignMaxTicks(vv[0],vv[1]))
-//    else
-//      Memo1.Lines.Add(plot.alignMaxTicks(vv[0]))  ;
-//  end;
-
-
 end;
 
 procedure TForm1.FormCreate(Sender: TObject);
