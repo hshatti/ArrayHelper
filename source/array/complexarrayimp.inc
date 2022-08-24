@@ -96,8 +96,64 @@ function TComplexArrayHelper.Sorted(CompareFunc: TCompareFuncComplex
 function TComplexArrayHelper.Slice(start, _end: integer): TComplexArray; _SLICE_;
 
 function TComplexArrayHelper.Splice(start, deleteCount: integer; Items: TComplexArray): TComplexArray; _SPLICE_;
+function TComplexArrayHelper.IndexOf(const val: Complex): integer;_INDEXOF_;
 
 function TComplexArrayHelper.Extract(const Indecies:TIntegerDynArray):TComplexArray; _EXTRACT_;
+procedure TComplexArrayHelper.Scatter(const indecies:TIntegerDynArray;const Values:TComplexArray); _SCATTER_;
+function TComplexArrayHelper.Find(const func:{$ifdef fpc}specialize{$endif} TSimpleFilterCallBack<Complex>):TIntegerDynArray;_FIND_;
+function TComplexArrayHelper.Find(const values:TComplexArray):TIntegerDynArray; _FINDVALS1_;
+function TComplexArrayHelper.Find(const value:Complex):TIntegerDynArray;   _FINDVALS2_;
+
+function TComplexArrayHelper.Intersect(const Other:TComplexArray;const binSearch:boolean=false):TComplexArray;
+var i,j:integer; tmp,tmp2:TComplexArray;  // compare:{$ifdef fpc}specialize{$endif}TCompareFuncNested<T>;
+//  function cmp(const a,b:T):integer;begin result:=-1; if a=b then result:=0 else if b>a then result:=1 end;
+begin
+  if Length(Self)>Length(Other) then    // search in the smallest array to imporove perfomance?
+    begin tmp:=Other;tmp2:=Self end
+  else
+    begin tmp:=Self;tmp2:=Other end;
+  setLength(Result,length(tmp)) ;
+  j:=0;
+  if binSearch then begin
+    for i:=0 to High(tmp) do
+      if {$ifdef fpc}specialize{$endif} _BinSearch<Complex,PComplex>(@tmp2[0],tmp[i],length(tmp2))>=0 then begin
+        result[j]:=tmp[i]  ;
+        inc(j)
+      end else
+  end else
+    for i:=0 to High(tmp) do
+      if tmp2.indexOf(tmp[i])>=0 then begin
+        result[j]:=tmp[i] ;
+        inc(j)
+      end ;
+  setLength(result,j)
+end;
+
+function TComplexArrayHelper.Difference(const Other:TComplexArray;const binSearch:boolean=false):TComplexArray;
+var i,j:integer;
+begin
+  setLength(Result,Length(Self));j:=0;
+  if binSearch then
+    for i:=0 to High(Self) do
+      if {$ifdef fpc}specialize{$endif} _BinSearch<Complex,PComplex>(@Other[0],Self[i],length(other))<0 then begin
+        Result[j]:=Self[i];
+        inc(j)
+      end else
+  else
+    for i:=0 to High(Self) do
+      if Other.indexOf(Self[i])<0 then begin
+        Result[j]:=Self[i];
+        inc(j)
+      end;
+  setLength(result,j)
+end;
+
+function TComplexArrayHelper.Lookup(const val:Complex):integer;
+begin
+  // assuming that the array is sorted
+  result:={$ifdef fpc}specialize{$endif} _BinSearch<Complex,PComplex>(@Self[0],Val,Length(Self),{$ifdef fpc}specialize{$endif} TCompareFunc<Complex>(@Self.cmp));
+end;
+
 
 function TComplexArrayHelper.add(const val: complex): TComplexArray;
 var i:integer;
@@ -866,18 +922,27 @@ begin
 end;
 
 
-{ Sort by magnitute length}
+{ Sort by real then imaginary or by magnitute length?}
 
 class function TComplexArrayHelper.cmp(const a, b: Complex): integer;
-var m1,m2:Float;
+//var m1,m2:Float;
 begin
-  {$ifdef use_lcl_complex}
-  m1:=cmod(a);m2:=cmod(b);
-  {$else}
-  m1:=a.mag();m2:=b.mag();
-  {$endif}
-  if m1>m2 then result:=1
-  else if m1<m2 then result:=-1 else result:=0;
+  result:=1;
+  if a=b then
+    result:=0
+  else if a<b then result:=-1;
+
+  //if a.re=b.re then
+  //  if a.im=b.im then begin result:=0{;exit} end
+  //  else if a.im<b.im then begin result:=-1{;exit} end else
+  //else
+  //  if a.re<b.re then
+  //    result:=-1
+
+
+  //m1:=a.mag();m2:=b.mag();
+  //if m1>m2 then result:=1
+  //else if m1<m2 then result:=-1 else result:=0;
 end;
 
 class procedure TComplexArrayHelper.QuickSort(var Arr: TComplexArray; const L, R: Longint;const Compare: TCompareFuncComplex);

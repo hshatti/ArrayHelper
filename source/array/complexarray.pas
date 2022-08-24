@@ -78,6 +78,7 @@ type
     class operator /(const a,b:TComplex):TComplex;   overload;
     class operator =(const a,b:TComplex):boolean;    overload;
     class operator **(const a,b:TComplex):TComplex;  overload;
+    class operator <(const a,b:TComplex):boolean; overload;
     {$else}
     class operator Implicit(const a:T):TComplex<T>;           overload;_inline
     class operator Implicit(const a:TComplex<T>):string;      overload;_inline
@@ -98,6 +99,7 @@ type
     class operator Subtract(const a:TComplex<T>;const b:Double):TComplex<T>;   overload;
     class operator Multiply(const a:TComplex<T>;const b:Double):TComplex<T>;   overload;
     class operator Divide(const a:TComplex<T>;const b:Double):TComplex<T>;   overload;
+    class operator LessThan(const a,b:TComplex<T>):boolean; overload;
 
     class operator **(const a,b:TComplex<T>):TComplex<T>;  overload;
     {$endif}
@@ -788,6 +790,12 @@ begin
   result:=a;
   result.pow(b)
 end;
+
+class operator TComplex.<(const a, b: TComplex): boolean;
+begin
+  result:=(a.re<b.re) or ((a.re=b.re) and (a.im<b.im));
+end;
+
 {$else}
 class operator TComplex<T>.Implicit(const a: TComplex<T>): string;
 var sign:string;i:T;
@@ -899,6 +907,12 @@ begin
   result:=a;
   result.pow(b)
 end;
+
+class operator TComplex.LessThan(const a, b: TComplex): boolean;
+begin
+  result:=(a.re<b.re) or ((a.re=b.re) and (a.im<b.im));
+end;
+
 
 {$endif}
 

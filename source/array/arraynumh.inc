@@ -19,6 +19,7 @@ type
    function Lookup(const val:Number):integer;
    function Map(func:{$ifdef fpc}specialize{$endif} TMapCallback<Number>):TNumberDynArray;  _inline          overload;
    function Map(func:{$ifdef fpc}specialize{$endif} TSimpleMapCallback<Number>):TNumberDynArray;  _inline    overload;
+   function Map(func:{$ifdef fpc}specialize{$endif} TSimpleMapCallbackNested<Number>):TNumberDynArray;  _inline    overload;
    function Map(func:{$ifdef fpc}specialize{$endif} TMapCallbackVar<Number>):TVariantArray;_inline           overload;
    function Map(const a,b,a1,b1:Number):TNumberDynArray; _inline                         overload;
    function Filter(func:{$ifdef fpc}specialize{$endif} TFilterCallback<Number,PNumber>):TNumberDynArray;  _inline
@@ -36,7 +37,7 @@ type
    function Magnitude(): Single; _inline
    function SumOfSquares(): Int64;  _inline
    function product:Int64;  _inline
-   function Sum():Int64;  _inline
+   function Sum():Int64;  {_inline } overload;
    function Mean():single;   _inline
    function Mode():single;   _inline
    function Median():Single;  _inline
@@ -55,6 +56,8 @@ type
    function Find(const func:{$ifdef fpc}specialize{$endif} TSimpleFilterCallBack<Number>):TIntegerDynArray;           _inline   overload;
    function Find(const values:TNumberDynArray):TIntegerDynArray;                                                      _inline   overload;
    function Find(const value:Number):TIntegerDynArray;                                                                _inline   overload;
+   function Intersect(const Other:TNumberDynArray;const binSearch:boolean=false):TNumberDynArray;
+   function Difference(const Other:TNumberDynArray;const binSearch:boolean=false):TNumberDynArray;
 
    function concat(Items:TNumberDynArray):TNumberDynArray;   _inline
    function ToString(const Seperator: string=', '):string;   _inline
@@ -75,8 +78,8 @@ type
    function DividedBy(const Vals:TNumberDynArray):TNumberDynArray;          _inline  overload;
    function DividedBy(const Vals:Number):TNumberDynArray;                   _inline  overload;
    function Dot(const Vals:TNumberDynArray):Number;
-   function Max():Number;  _inline                                                overload;
-   function Min():Number;  _inline                                                overload;
+   function Max():Number; { _inline}                                                overload;
+   function Min():Number; { _inline}                                                overload;
    function Max(const Val:Number):TNumberDynArray;  _inline                       overload;
    function Min(const Val:number):TNumberDynArray;  _inline                       overload;
    function Max(const Vals:TNumberDynArray):TNumberDynArray;  _inline             overload;
@@ -136,6 +139,7 @@ type
    function Sorted(CompareFunc:{$ifdef fpc}specialize{$endif} TCompareFunc<TNumberDynArray> = nil):TNumberArrayArray;   _inline
    function Map(func:{$ifdef fpc}specialize{$endif} TMapCallback<TNumberDynArray>):TNumberArrayArray;     _inline                        overload;
    function Map(func:{$ifdef fpc}specialize{$endif} TSimpleMapCallback<TNumberDynArray>):TNumberArrayArray;    _inline                   overload;
+   function Map(func:{$ifdef fpc}specialize{$endif} TSimpleMapCallbackNested<TNumberDynArray>):TNumberArrayArray;    _inline                   overload;
    function Map(func:{$ifdef fpc}specialize{$endif} TMapCallbackVar<TNumberDynArray>):TVariantArray;     _inline                         overload;
    function Filter(func:{$ifdef fpc}specialize{$endif} TFilterCallback<TNumberDynArray,PNumberArray>):TNumberArrayArray;   _inline
    function Unique():TNumberArrayArray;_inline

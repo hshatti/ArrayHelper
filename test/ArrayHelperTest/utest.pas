@@ -376,10 +376,19 @@ const
   SampleSize=trunc(44100*sampleTime);
 
 procedure TForm1.Button2Click(Sender: TObject);
-var i:integer;
+var i:integer;i1,i2,i3:TIntegers;
 begin
-  signale :=TSingleDynArray.fill(sampleSize, 0, 100*PIx2/44100,0).Sin(0.2);
-  signale2:=TSingleDynArray.fill(sampleSize, 0, 200*PIx2/44100,0).Sin(0.2);
+  i1:=TIntegers.fill(100000,0,2);
+  i2:=TIntegers.fill(100000,2000,3);
+  i:=HighResTimer.MicroSeconds;
+  i3:=i1.intersect(i2,false);
+  i:=HighResTimer.MicroSeconds-i;
+  Memo1.Lines.add(i3.sum().ToString+' took : '+IntToStr(i));
+  i:=HighResTimer.MicroSeconds;
+  i3:=i1.intersect(i2,true);
+  i:=HighResTimer.MicroSeconds-i;
+  Memo1.Lines.add(i3.sum().ToString+' took : '+IntToStr(i));
+
 
 //  Player.SampleSize:=sampleSize;
 //  Player.InterleavedChannel:=false;

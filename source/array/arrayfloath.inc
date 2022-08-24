@@ -20,8 +20,9 @@ type
   function isSorted(const descending:boolean =false; CompareFunc: {$ifdef fpc}specialize{$endif} TCompareFunc<Float> = nil):boolean;
   function Lookup(const val:Float):integer;
   function Map(func: {$ifdef fpc}specialize{$endif} TMapCallback<Float>): TFloatDynArray;   _inline          overload;
-  function Map(proc: {$ifdef fpc}specialize{$endif} TSIMDMap<PFloat>): TFloatDynArray;      _inline          overload;
   function Map(func:{$ifdef fpc}specialize{$endif} TSimpleMapCallback<Float>):TFloatDynArray;  _inline       overload;
+  function Map(func:{$ifdef fpc}specialize{$endif} TSimpleMapCallbackNested<Float>):TFloatDynArray;  _inline       overload;
+  function Map(proc: {$ifdef fpc}specialize{$endif} TSIMDMap<PFloat>): TFloatDynArray;      _inline          overload;
   function Map(func: {$ifdef fpc}specialize{$endif} TMapCallbackVar<Float>): TVariantArray;  _inline         overload;
   function Map(const a,b,a1,b1:Float):TFloatDynArray;               _inline                                  overload;
   //function Filter(func:{$ifdef fpc}specialize{$endif} TFilterFunc<Float>):TFloatDynArray;  _inline
@@ -113,6 +114,8 @@ type
   function Find(const func:{$ifdef fpc}specialize{$endif} TSimpleFilterCallBack<Float>):TIntegerDynArray;     overload;
   function Find(const values:TFloatDynArray):TIntegerDynArray;                                                overload;
   function Find(const value:Float):TIntegerDynArray;                                                          overload;
+  function Intersect(const Other:TFloatDynArray;const binSearch:boolean=false):TFloatDynArray;
+  function Difference(const Other:TFloatDynArray;const binSearch:boolean=false):TFloatDynArray;
 
   function concat(Items:TFloatDynArray):TFloatDynArray; _inline
   function ToString(const Seperator: string=', ';const digits:ShortInt=-1):string;
@@ -178,6 +181,7 @@ public
    function Lookup(const val:TFloatDynArray):integer;
    function Map(func:{$ifdef fpc}specialize{$endif} TMapCallback<TFloatDynArray>):TFloatArrayArray;   _inline                                  overload;
    function Map(func:{$ifdef fpc}specialize{$endif} TSimpleMapCallback<TFloatDynArray>):TFloatArrayArray;    _inline                           overload;
+   function Map(func:{$ifdef fpc}specialize{$endif} TSimpleMapCallbackNested<TFloatDynArray>):TFloatArrayArray;    _inline                           overload;
    function Map(func:{$ifdef fpc}specialize{$endif} TMapCallbackVar<TFloatDynArray>):TVariantArray;   _inline                                  overload;
    function Filter(func:{$ifdef fpc}specialize{$endif} TFilterCallback<TFloatDynArray,PFloatDynArray>):TFloatArrayArray;    _inline
    //function Filter(func: {$ifdef fpc}specialize{$endif} TFilterFunc<TFloatDynArray>): TFloatArrayArray;_inline

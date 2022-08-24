@@ -240,6 +240,7 @@ type
 
     function Map(func:{$ifdef fpc}specialize{$endif} TMapCallback<string>):TStringDynArray;          overload;
     function Map(func:{$ifdef fpc}specialize{$endif} TSimpleMapCallback<string>):TStringDynArray;    overload;
+    function Map(func:{$ifdef fpc}specialize{$endif} TSimpleMapCallbackNested<string>):TStringDynArray;    overload;
     function Map(func:{$ifdef fpc}specialize{$endif} TMapCallbackVar<string>):TVariantArray;      overload;
     function Filter(func:{$ifdef fpc}specialize{$endif} TFilterCallback<string,PString>):TStringDynArray;
     //function Filter(func:{$ifdef fpc}specialize{$endif} TFilterFunc<string>):TStringDynArray;
@@ -260,6 +261,9 @@ type
     function Find(const func:{$ifdef fpc}specialize{$endif} TSimpleFilterCallBack<String>):TIntegerDynArray;   overload;
     function Find(const values:TStringDynArray):TIntegerDynArray;                                              overload;
     function Find(const value:String):TIntegerDynArray;                                                        overload;
+    function Intersect(const Other:TStringDynArray;const binSearch:boolean=false):TStringDynArray; _inline
+    function Difference(const Other:TStringDynArray;const binSearch:boolean=false):TStringDynArray; _inline
+
     function Mode():string;
     function concat(Items:TStringDynArray):TStringDynArray;
     function reverse():TStringDynArray;
@@ -303,6 +307,7 @@ type
     function Lookup(const val:TStringDynArray):integer;
     function Map(func:{$ifdef fpc}specialize{$endif} TMapCallback<TStringDynArray>):TStringArrayArray;          overload;
     function Map(func:{$ifdef fpc}specialize{$endif} TSimpleMapCallback<TStringDynArray>):TStringArrayArray;    overload;
+    function Map(func:{$ifdef fpc}specialize{$endif} TSimpleMapCallbackNested<TStringDynArray>):TStringArrayArray;    overload;
     function Map(func:{$ifdef fpc}specialize{$endif} TMapCallbackVar<TStringDynArray>):TVariantArray;           overload;
     function Filter(func:{$ifdef fpc}specialize{$endif} TFilterCallback<TStringDynArray, PStringArray>):TStringArrayArray;
     function unique():TStringArrayArray;
@@ -385,9 +390,11 @@ operator +(const v: TStringDynArray ;const Arr: TStringArrayArray  ): TStringArr
 {$ifdef fpc}generic{$endif} function Slice<ARR>(const Self:ARR; start,_end:integer):ARR;
 {$ifdef fpc}generic{$endif} function Extract<ARR>(const Self:ARR; const Indecies:TIntegerDynArray):ARR;
 {$ifdef fpc}generic{$endif} procedure Scatter<ARR>(const Self:ARR; const Indecies:TIntegerDynArray;const Values:ARR);
-{$ifdef fpc}generic{$endif} function Find<T>(const Self:array of T; const func:{$ifdef fpc}specialize{$endif} TSimpleFilterCallback<T>):TIntegerDynArray;  {$ifdef delphi}override;{$endif}
-{$ifdef fpc}generic{$endif} function Find<T>(const Self:array of T; const Values:array of T):TIntegerDynArray;                                             {$ifdef delphi}override;{$endif}
-{$ifdef fpc}generic{$endif} function Find<T>(const Self:array of T; const Value:T):TIntegerDynArray;                                                       {$ifdef delphi}override;{$endif}
+{$ifdef fpc}generic{$endif} function Find<T>(const Self:array of T; const func:{$ifdef fpc}specialize{$endif} TSimpleFilterCallback<T>):TIntegerDynArray;  {$ifdef delphi}overload;{$endif}
+{$ifdef fpc}generic{$endif} function Find<T>(const Self:array of T; const Values:array of T):TIntegerDynArray;                                             {$ifdef delphi}overload;{$endif}
+{$ifdef fpc}generic{$endif} function Find<T>(const Self:array of T; const Value:T):TIntegerDynArray;                                                       {$ifdef delphi}overload;{$endif}
+{$ifdef fpc}generic{$endif} function Intersect<T>(const Self,other:{$ifdef fpc}specialize{$endif} TArray<T>;const binSearch:boolean=false):{$ifdef fpc}specialize{$endif} TArray<T>;
+{$ifdef fpc}generic{$endif} function Difference<T>(const Self,other:{$ifdef fpc}specialize{$endif} TArray<T>;const binSearch:boolean=false):{$ifdef fpc}specialize{$endif} TArray<T>;
 
 
 
@@ -400,11 +407,11 @@ operator +(const v: TStringDynArray ;const Arr: TStringArrayArray  ): TStringArr
 {$ifdef fpc}generic{$endif} function IndexOf<ARR,T>(const Self:ARR;    const val:T;const aCount:integer):integer;overload;
 {$ifdef fpc}generic{$endif} procedure Fill<T>(Self:array of T;const Val:T);                                      overload;
 {$ifdef fpc}generic{$endif} procedure Fill<ARR,T>(Self:ARR;const aCount:integer;const Val:T);                    overload;
-
+{$ifdef fpc}generic{$endif} function Fill<T>(const aCount:integer;const Val:T):{$ifdef fpc}specialize {$endif}TArray<T>; overload;
 {$ifdef fpc}generic {$endif}function MaxNumber<T>(const Data:array of T):T;overload;
 {$ifdef fpc}generic {$endif}function MinNumber<T>(const Data:array of T):T;overload;
 {$ifdef fpc}generic {$endif}function SumNumber<T, R>(const Data:array of T):R;overload;
-{$ifdef fpc}generic {$endif}function SumNumber<T>(const Data:array of T):T;overload;
+//{$ifdef fpc}generic {$endif}function SumNumber<T>(const Data:array of T):T;overload;
 
 function dotest(pa:integer):string;
 
@@ -436,13 +443,13 @@ begin
     Result := Result+ Data[I];
 end;
 
-{$ifdef fpc}generic {$endif}function SumNumber<T>(const Data:array of T):T;
-var i:integer;
-begin
-  Result:=0;
-  For I := Low(Data) To High(Data) Do
-    Result := Result+ Data[I];
-end;
+//{$ifdef fpc}generic {$endif}function SumNumber<T>(const Data:array of T):T;
+//var i:integer;
+//begin
+//  Result:=0;
+//  For I := Low(Data) To High(Data) Do
+//    Result := Result+ Data[I];
+//end;
 
 
 
@@ -497,10 +504,59 @@ end;
 {$ifdef fpc}generic{$endif} function IndexOf<ARR,T>(const Self:ARR;    const val:T;  const aCount:integer):integer;var i:integer;     begin result := -1 ; for i:=0 to aCount-1 do if Self[i]=val then exit(i) end;
 {$ifdef fpc}generic{$endif} procedure Fill<T>(Self:array of T;const Val:T); var i:integer;                           begin for i:=0 to High(Self) do Self[i]:=Val end;
 {$ifdef fpc}generic{$endif} procedure Fill<ARR,T>(Self:ARR;const aCount:integer;const Val:T); var i:integer;         begin for i:=0 to aCount-1 do Self[i]:=Val end;
+{$ifdef fpc}generic{$endif} function Fill<T>(const aCount:integer;const Val:T):{$ifdef fpc}specialize {$endif}TArray<T>; var i:integer;         begin setLength(result,aCount);for i:=0 to aCount-1 do result[i]:=Val end;
+
 
 {$ifdef fpc}generic{$endif} function Find<T>(const Self:array of T; const func:{$ifdef fpc}specialize{$endif} TSimpleFilterCallback<T>):TIntegerDynArray;  _FIND_;
 {$ifdef fpc}generic{$endif} function Find<T>(const Self:array of T; const Values:array of T):TIntegerDynArray;                                _FINDVALS1_;
 {$ifdef fpc}generic{$endif} function Find<T>(const Self:array of T; const Value:T):TIntegerDynArray;                                          _FINDVALS2_;
+
+{$ifdef fpc}generic{$endif} function Intersect<T>(const Self,other:{$ifdef fpc}specialize{$endif} TArray<T>;const binSearch:boolean):{$ifdef fpc}specialize{$endif} TArray<T>;
+type PT=^T;
+var i,j:integer; tmp,tmp2:{$ifdef fpc}specialize{$endif} TArray<T>;  // compare:{$ifdef fpc}specialize{$endif}TCompareFuncNested<T>;
+//  function cmp(const a,b:T):integer;begin result:=-1; if a=b then result:=0 else if b>a then result:=1 end;
+begin
+  if Length(Self)>Length(Other) then    // search in the smallest array to imporove perfomance?
+    begin tmp:=Other;tmp2:=Self end
+  else
+    begin tmp:=Self;tmp2:=Other end;
+  setLength(Result,length(tmp)) ;
+  j:=0;
+  if binSearch then begin
+    for i:=0 to High(tmp) do
+      if {$ifdef fpc}specialize{$endif} _BinSearch<T,PT>(@tmp2[0],tmp[i],length(tmp2))>=0 then begin
+        result[j]:=tmp[i]  ;
+        inc(j)
+      end else
+  end else
+    for i:=0 to High(tmp) do
+      if {$ifdef fpc}specialize{$endif} Indexof<T>(tmp2,tmp[i])>=0 then begin
+        result[j]:=tmp[i] ;
+        inc(j)
+      end ;
+  setLength(result,j)
+end;
+
+{$ifdef fpc}generic{$endif} function Difference<T>(const Self,other:{$ifdef fpc}specialize{$endif} TArray<T>;const binSearch:boolean=false):{$ifdef fpc}specialize{$endif} TArray<T>;
+type PT=^T;
+var i,j:integer;
+//function cmp(const a,b:T):integer;begin result:=-1; if a=b then result:=0 else if b>a then result:=1 end;
+begin
+  setLength(Result,Length(Self));j:=0;
+  if binSearch then
+    for i:=0 to High(Self) do
+      if {$ifdef fpc}specialize{$endif} _BinSearch<T,PT>(@Other[0],Self[i],length(other))<0 then begin
+        Result[j]:=Self[i];
+        inc(j)
+      end else
+  else
+    for i:=0 to High(Self) do
+      if {$ifdef fpc}specialize{$endif} IndexOf<T>(Other,Self[i])<0 then begin
+        Result[j]:=Self[i];
+        inc(j)
+      end;
+  setLength(result,j)
+end;
 
 
 (*
@@ -713,6 +769,8 @@ function TStringArrayArrayHelper.Map(func: {$ifdef fpc}specialize{$endif} TMapCa
 
 function TStringArrayArrayHelper.Map(func: {$ifdef fpc}specialize{$endif} TSimpleMapCallback<TStringDynArray> ): TStringArrayArray; _SIMPLEMAP_;
 
+function TStringArrayArrayHelper.Map(func: {$ifdef fpc}specialize{$endif} TSimpleMapCallbackNested<TStringDynArray> ): TStringArrayArray; _SIMPLEMAP_;
+
 function TStringArrayArrayHelper.Map(func: {$ifdef fpc}specialize{$endif} TMapCallbackVar<TStringDynArray>): TVariantArray;_DOMAP_;
 
 function TStringArrayArrayHelper.Filter(func: {$ifdef fpc}specialize{$endif} TFilterCallback<TStringDynArray,PStringArray> ): TStringArrayArray;_FILTER_;
@@ -816,6 +874,8 @@ function TStringArrayHelper.Map(func: {$ifdef fpc}specialize{$endif} TMapCallbac
 
 function TStringArrayHelper.Map(func: {$ifdef fpc}specialize{$endif} TSimpleMapCallback<string> ): TStringDynArray;_SIMPLEMAP_;
 
+function TStringArrayHelper.Map(func: {$ifdef fpc}specialize{$endif} TSimpleMapCallbackNested<string> ): TStringDynArray;_SIMPLEMAP_;
+
 function TStringArrayHelper.Map(func: {$ifdef fpc}specialize{$endif} TMapCallbackVar<string>): TVariantArray;_DOMAP_;
 
 
@@ -866,6 +926,17 @@ begin
 end;
 
 function TStringArrayHelper.indexOf(const val: string): integer; _INDEXOF_;
+
+function TStringArrayHelper.Intersect(const Other:TStringDynArray;const binSearch:boolean):TStringDynArray;
+begin
+  result:={$ifdef fpc}specialize{$endif} Intersect<string>(Self,Other,binSearch);
+end;
+
+function TStringArrayHelper.Difference(const Other:TStringDynArray;const binSearch:boolean):TStringDynArray;
+begin
+  result:={$ifdef fpc}specialize{$endif} Difference<string>(Self,Other,binSearch);
+end;
+
 
 function TStringArrayHelper.mode():string;
 var i,C,e,r:integer;vs:TStringDynArray;a:TIntegerDynArray;

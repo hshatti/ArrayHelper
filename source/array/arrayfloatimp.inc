@@ -98,6 +98,15 @@ begin
     Result[i]:=func(Self[i]);
 end;
 
+function TFloatArrayHelper.Map(func: {$ifdef fpc}specialize{$endif} TSimpleMapCallbackNested<Float> ): TFloatDynArray;// _SIMPLEMAP_;
+var i,C:integer;
+begin
+  c:=Count;
+  setLength(result,C);
+  for i:=0 To C-1 do
+    Result[i]:=func(Self[i]);
+end;
+
 function TFloatArrayHelper.Map(proc: {$ifdef fpc}specialize{$endif} TSIMDMap<PFloat>): TFloatDynArray;
 var C,L:Integer;
 begin
@@ -918,6 +927,16 @@ function TFloatArrayHelper.Find(const values:TFloatDynArray):TIntegerDynArray;  
 
 function TFloatArrayHelper.Find(const value:Float):TIntegerDynArray;              _FINDVALS2_;
 
+function TFloatArrayHelper.Intersect(const Other:TFloatDynArray;const binSearch:boolean):TFloatDynArray;
+begin
+  result:={$ifdef fpc}specialize{$endif} Intersect<Float>(Self,Other,binSearch);
+end;
+
+function TFloatArrayHelper.Difference(const Other:TFloatDynArray;const binSearch:boolean):TFloatDynArray;
+begin
+  result:={$ifdef fpc}specialize{$endif} Difference<Float>(Self,Other,binSearch);
+end;
+
 function TFloatArrayHelper.concat(Items: TFloatDynArray): TFloatDynArray; _CONCAT_;
 
 function TFloatArrayHelper.reverse():TFloatDynArray; _REVERSE_;
@@ -1695,6 +1714,8 @@ end;
 function TFloatArrayArrayHelper.Map(func: {$ifdef fpc}specialize{$endif} TMapCallback<TFloatDynArray>): TFloatArrayArray; _DOMAP_;
 
 function TFloatArrayArrayHelper.Map(func: {$ifdef fpc}specialize{$endif} TSimpleMapCallback<TFloatDynArray>): TFloatArrayArray;_SIMPLEMAP_;
+
+function TFloatArrayArrayHelper.Map(func: {$ifdef fpc}specialize{$endif} TSimpleMapCallbackNested<TFloatDynArray>): TFloatArrayArray;_SIMPLEMAP_;
 
 function TFloatArrayArrayHelper.Map(func: {$ifdef fpc}specialize{$endif} TMapCallbackVar<TFloatDynArray>): TVariantArray;_DOMAP_;
 

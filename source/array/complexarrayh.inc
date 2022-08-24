@@ -22,9 +22,19 @@
    function Map(func:{$ifdef fpc}specialize{$endif} TMapCallbackVar<Complex>):TVariantArray;       _inline        overload;
    function Sort(CompareFunc: TCompareFuncComplex= nil):TComplexArray;            _inline
    function Sorted(CompareFunc: TCompareFuncComplex= nil):TComplexArray;          _inline
+   function Lookup(const val:Complex):integer;
    function Slice(start,_end:integer):TComplexArray;  _inline
    function Splice(start,deleteCount:integer;Items:TComplexArray):TComplexArray; _inline
    function Extract(const Indecies:TIntegerDynArray):TComplexArray; _inline
+   procedure Scatter(const indecies:TIntegerDynArray;const Values:TComplexArray); _inline
+   function IndexOf(const val: Complex): integer;_inline
+   function Find(const func:{$ifdef fpc}specialize{$endif} TSimpleFilterCallBack<Complex>):TIntegerDynArray;     overload;
+   function Find(const values:TComplexArray):TIntegerDynArray;                                                overload;
+   function Find(const value:Complex):TIntegerDynArray;                                                          overload;
+   function Intersect(const Other:TComplexArray;const binSearch:boolean=false):TComplexArray;
+   function Difference(const Other:TComplexArray;const binSearch:boolean=false):TComplexArray;
+
+
    function add(const val:Float):TComplexArray;   _inline     overload;
    function sub(const val:Float):TComplexArray;   _inline     overload;
    function mul(const val:Float):TComplexArray;   _inline     overload;

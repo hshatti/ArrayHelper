@@ -32,6 +32,7 @@ function TNumberArrayHelper.Map(func: {$ifdef fpc}specialize{$endif} TMapCallbac
 
 function TNumberArrayHelper.Map(func: {$ifdef fpc}specialize{$endif} TSimpleMapCallback<Number> ): TNumberDynArray; _SIMPLEMAP_;
 
+function TNumberArrayHelper.Map(func: {$ifdef fpc}specialize{$endif} TSimpleMapCallbackNested<Number>): TNumberDynArray; _SIMPLEMAP_;
 
 function TNumberArrayHelper.Map(func: {$ifdef fpc}specialize{$endif} TMapCallbackVar<Number>): TVariantArray;_DOMAP_;
 
@@ -190,7 +191,11 @@ begin
 end;
 
 function TNumberArrayHelper.Sum(): Int64;
+var i:integer;
 begin
+  //result:=0;
+  //for i:=0 to High(Self) do result:=result+Self[i]
+  //result:=SumInt(Self);
   result:={$ifdef FPC}specialize {$endif}SumNumber<Number,Int64>(Self);
 end;
 
@@ -375,6 +380,16 @@ function TNumberArrayHelper.Find(const values:TNumberDynArray):TIntegerDynArray;
 function TNumberArrayHelper.Find(const value:Number):TIntegerDynArray;              _FINDVALS2_;
 
 function TNumberArrayHelper.concat(Items: TNumberDynArray): TNumberDynArray;_CONCAT_;
+
+function TNumberArrayHelper.Intersect(const Other:TNumberDynArray;const binSearch:boolean):TNumberDynArray;
+begin
+  result:={$ifdef fpc}specialize{$endif} Intersect<Number>(Self,Other,binSearch);
+end;
+
+function TNumberArrayHelper.Difference(const Other:TNumberDynArray;const binSearch:boolean):TNumberDynArray;
+begin
+  result:={$ifdef fpc}specialize{$endif} Difference<Number>(Self,Other,binSearch);
+end;
 
 function TNumberArrayHelper.ToString(const Seperator: string): string;
 var i:integer;
@@ -754,6 +769,8 @@ function TNumberArrayArrayHelper.Sorted(CompareFunc: {$ifdef fpc}specialize{$end
 function TNumberArrayArrayHelper.Map(func: {$ifdef fpc}specialize{$endif} TMapCallback<TNumberDynArray>): TNumberArrayArray;_DOMAP_;
 
 function TNumberArrayArrayHelper.Map(func: {$ifdef fpc}specialize{$endif} TSimpleMapCallback<TNumberDynArray>): TNumberArrayArray;_SIMPLEMAP_;
+
+function TNumberArrayArrayHelper.Map(func: {$ifdef fpc}specialize{$endif} TSimpleMapCallbackNested<TNumberDynArray>): TNumberArrayArray;_SIMPLEMAP_;
 
 function TNumberArrayArrayHelper.Map(func: {$ifdef fpc}specialize{$endif} TMapCallbackVar<TNumberDynArray>): TVariantArray;_DOMAP_;
 

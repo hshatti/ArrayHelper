@@ -1,6 +1,6 @@
 unit ArrayHelperCommon;
 
-{$mode objfpc}{$H+}
+{$mode objfpc}{$H+} {$ModeSwitch nestedprocvars}
 
 interface
 
@@ -30,21 +30,29 @@ type
 
   TDateTimeArray= array of TDateTime;
   {$ifdef fpc}generic{$endif} TRecudeCallback<T> = function(const a,b:T;const i:integer;arr:array of T):T;
+  {$ifdef fpc}generic{$endif} TRecudeCallbackNested<T> = function(const a,b:T;const i:integer;arr:array of T):T is Nested;
   {$ifdef fpc}generic{$endif} TSimpleReduceCallback<T>=function(a,b:T):T;
   {$ifdef fpc}generic{$endif} TComparefunc<T> = function(const a,b:T):integer ;
+  {$ifdef fpc}generic{$endif} TComparefuncNested<T> = function(const a,b:T):integer is nested;
   {$ifdef fpc}generic{$endif} TMapCallBack<T>=function (const a:T;i:Integer;Arr:array of T):T;
+  {$ifdef fpc}generic{$endif} TMapCallBackNested<T>=function (const a:T;i:Integer;Arr:array of T):T is nested;
   {$ifdef fpc}generic{$endif} TMapCallBackR<T,R>=function (const a:T;i:Integer;Arr:array of T):R;
   {$ifdef fpc}generic{$endif} TMapCallBack2<T>=function (const a:T;i:Integer;Arr:array of T):Double;
   {$ifdef fpc}generic{$endif} TSimpleMapCallback<T>=function (a:T):T;
+  {$ifdef fpc}generic{$endif} TSimpleMapCallbackNested<T>=function (a:T):T is Nested;
   {$ifdef fpc}generic{$endif} TConvertCallback<T,R>=function (const a:T):R;
   {$ifdef fpc}generic{$endif} TSimpleFilterCallback<T>=function (const a:T):boolean;
+  {$ifdef fpc}generic{$endif} TSimpleFilterCallbackNested<T>=function (const a:T):boolean is Nested;
   {$ifdef fpc}generic{$endif} TSIMDMap<PT>=procedure (const a:PT;const C:PInteger;const L:integer);
   {$ifdef fpc}generic{$endif} TSimpleMapCallbackComplex<T>=function (a:T):Double;
   {$ifdef fpc}generic{$endif} TMapCallbackVar<T>=function (const a:T;const i:Integer; Arr:array of T):Variant;
   {$ifdef fpc}generic{$endif} TFilterCallback<T,PT>=function (const a:T;const i:Integer; Arr:PT):boolean;
+  {$ifdef fpc}generic{$endif} TFilterCallbackNested<T,PT>=function (const a:T;const i:Integer; Arr:PT):boolean is nested;
   TMapCallbackSingle={$ifdef fpc}specialize{$endif} TMapCallback<Single>;
+  TMapCallbackDouble={$ifdef fpc}specialize{$endif} TMapCallback<Double>;
   {$ifdef fpc}generic{$endif} function _Compare<T>(const a,b:T):integer;
-  {$ifdef fpc}generic{$endif} function _BinSearch<T,PT>(const Arr:PT;const Val:T;R:integer;const Compare:{$ifdef fpc}specialize{$endif} TComparefunc<T>):integer;
+  {$ifdef fpc}generic{$endif} function _BinSearch<T,PT>(const Arr:PT;const Val:T;R:integer; const Compare:{$ifdef fpc}specialize{$endif} TComparefunc<T>):integer;          overload;
+  {$ifdef fpc}generic{$endif} function _BinSearch<T,PT>(const Arr:PT;const Val:T; R:integer; Compare:{$ifdef fpc}specialize{$endif} TComparefuncNested<T> =nil):integer;     overload;
   {$ifdef fpc}generic{$endif} procedure _QuickSort<T,PT>(const Arr: PT; L, R : Longint; const Compare: {$ifdef fpc}specialize{$endif} TComparefunc<T>); inline ;
   {$ifdef fpc}generic{$endif} procedure _Reverse<T,PT>(const Arr: PT; const aCount: Longint); inline ;
 
@@ -90,7 +98,13 @@ implementation
 
 {$ifdef fpc}generic{$endif} function _Compare<T>(const a,b:T):integer;
 begin
-  result:=b-a
+ result:=1;
+ if a=b then
+   result:=0
+ else
+   if a<b then
+   result:=-1
+   //result:=b-a
 end;
 
 //  slightly modified from https://graphics.stanford.edu/~seander/bithacks.html
@@ -238,13 +252,51 @@ begin
 end;
 
 
-{$ifdef fpc}generic{$endif} function _BinSearch<T,PT>(const Arr:PT;const Val:T; R:integer;const Compare:{$ifdef fpc}specialize{$endif} TComparefunc<T>):integer;
+{$ifdef fpc}generic{$endif} function _BinSearch<T,PT>(const Arr:PT;const Val:T; R:integer; Compare:{$ifdef fpc}specialize{$endif} TComparefunc<T>):integer;
 var
   L, I: Integer;
   CompareRes: PtrInt;isFound:boolean;
 begin
   isFound := false;
   result:=-1;
+  // Use binary search.
+  L := 0;
+  R := R - 1;
+  while (L<=R) do
+  begin
+    I := L + (R - L) shr 1;
+    CompareRes := Compare(Val, Arr[I]);
+    if (CompareRes>0) then
+      L := I+1
+    else begin
+      R := I-1;
+      if (CompareRes=0) then begin
+         isFound := true;
+//         if (Duplicates<>dupAccept) then
+            L := I; // forces end of while loop
+      end;
+    end;
+  end;
+  if isFound then result := L else result:=-L-1;
+end;
+
+{$ifdef fpc}generic{$endif} function _BinSearch<T,PT>(const Arr:PT;const Val:T; R:integer; Compare:{$ifdef fpc}specialize{$endif} TComparefuncNested<T>):integer;
+var
+  L, I: Integer;
+  CompareRes: PtrInt;isFound:boolean;
+  function cmp(const a,b:T):integer;
+  begin
+    result:=1;
+    if a=b then
+      result:=0
+    else
+      if a<b then
+      result:=-1
+  end;
+begin
+  isFound := false;
+  result:=-1;
+  if not assigned(Compare) then Compare:={$ifdef fpc}@{$endif}cmp;
   // Use binary search.
   L := 0;
   R := R - 1;
