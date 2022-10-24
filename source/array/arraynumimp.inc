@@ -3,7 +3,7 @@
 
 procedure TNumberArrayHelper.SetCount(AValue: integer); _SETCOUNT_;
 
-function TNumberArrayHelper.reduce(func: {$ifdef fpc}specialize{$endif} TRecudeCallback<Number>; const init: Number): Number;
+function TNumberArrayHelper.reduce(func: {$ifdef fpc}specialize{$endif} TReduceCallback<Number>; const init: Number): Number;
 var i,l:integer;
 begin
     l:=Length(Self);
@@ -756,7 +756,7 @@ function TNumberArrayArrayHelper.GetCount: integer;_DOCOUNT_;
 
 procedure TNumberArrayArrayHelper.SetCount(AValue: integer);_SETCOUNT_;
 
-function TNumberArrayArrayHelper.reduce(func: {$ifdef fpc}specialize{$endif} TRecudeCallback<TNumberDynArray>; const init: TNumberDynArray): TNumberDynArray; _REDUCE_;
+function TNumberArrayArrayHelper.reduce(func: {$ifdef fpc}specialize{$endif} TReduceCallback<TNumberDynArray>; const init: TNumberDynArray): TNumberDynArray; _REDUCE_;
 
 function TNumberArrayArrayHelper.reduce(func: {$ifdef fpc}specialize{$endif} TSimpleReduceCallback<TNumberDynArray>): TNumberDynArray;_SIMPLEREDUCE_;
 
@@ -808,7 +808,7 @@ function TNumberArrayArrayHelper.ToString(const Seperator: string): string;
 var i:integer;
 begin
   for i:=0 to Count-1 do
-    result:=Result+Seperator+#13#10+Self[i].ToString(Seperator) ;
+    result:=Result+Seperator+LineEnding+Self[i].ToString(Seperator) ;
   delete(result,1,Length(Seperator)+2);
   result:='['+result+']';
 end;

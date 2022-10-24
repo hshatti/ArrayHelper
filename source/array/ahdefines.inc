@@ -6,9 +6,9 @@
 
 {$define _SIMPLEMAP_:=var i,C:integer; begin C:=Length(Self);setLength(result,C);for i:=0 To C-1 do Result[i]:=func(Self[i]); end}
 
-{$define _REDUCE_:=var i,l:integer;begin l:=Length(Self); if l>0 then result:=func(init,self[0],0,Self);if l>1 then for i:=1 to l-1 do result:=func(Self[i-1],self[i],i,self) end}
+{$define _REDUCE_:=var i,l:integer;begin l:=Length(Self); if l>0 then result:=func(init,self[0],0,Self);if l>1 then for i:=1 to l-1 do result:=func(result,self[i],i,self) end}
 
-{$define _SIMPLEREDUCE_:=var i,l:integer; begin l:=Length(Self); if l>1 then for i:=1 to l-1 do result:=func(Self[i-1],self[i]) end}
+{$define _SIMPLEREDUCE_:=var i,l:integer; begin l:=Length(Self); if l>0 then result:=self[0]; for i:=1 to l-1 do result:=func(result,self[i]) end}
 
 {$define _DOSORT_:=begin if Assigned(CompareFunc) then QuickSort(Self, 0, High(Self),CompareFunc) else QuickSort(Self, 0, High(Self),@cmp);result:=self end}
 
@@ -45,7 +45,7 @@
 
 {$define _TRANSPOSE_:=var i,j:integer; begin Assert(Assigned(Self),'must be a 2D Array'); setLength(Result, Length(Self[0]));for i:=0 to length(result)-1 do begin setLength(Result[i], Length(Self)); for j:=0 to Length(Self)- 1 do Result[i,j]:=Self[j,i] end end}
 
-{$define _CONCAT_:=var l,i,C:integer; begin C:=Length(Self);l:=Length(Items);setLength(Result,C+l);if Self<>Result then Move(Self[0],Result[0],C*SizeOf(Result[0]));for i:=0 to l-1 do Result[C+i]:=Items[i] end}
+{$define _CONCAT_:=var l,i,C:integer; begin C:=Length(Self);l:=Length(Items);setLength(Result,C+l);if (Self<>Result) and (C>0) then Move(Self[0],Result[0],C*SizeOf(Result[0]));for i:=0 to l-1 do Result[C+i]:=Items[i] end}
 
 {$define _INDEXOF_:=var C:integer; begin C:=Length(Self);for result:=0 to C-1 do if Self[result]=val then exit;result:=-1  end}
 

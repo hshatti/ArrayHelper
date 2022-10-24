@@ -179,7 +179,7 @@ type
 (*    procedure CallKernel(const Index: integer; const dst: PLongWord;const c: integer);inline;  *)
     procedure CallKernel(const Index: integer; const dst, a, b: PSingle; const bias:single;const c: integer);
     procedure CallKernel(const Index: integer; const params: TPointerDynArray);
-    procedure CallKernel(const Index: integer; const dst: PInteger; const c: integer);
+    procedure CallKernel(const Index: integer; const dst: PLongWord; const c: integer);
 
   end;
 
@@ -633,7 +633,7 @@ begin
 
 end;
 
-procedure TOpenCL.CallKernel(const Index: integer; const dst:PInteger;const c:integer);
+procedure TOpenCL.CallKernel(const Index: integer; const dst:PLongWord;const c:integer);
 var ki:TCLKernelInfo;sz:cSize_t;i:integer;
 begin
   sz:=FGlobalWorkGroupSizes[0];

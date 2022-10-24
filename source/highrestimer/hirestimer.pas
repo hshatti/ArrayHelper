@@ -3,7 +3,7 @@ unit hirestimer;
 {$mode objfpc}{$H+}{$W-}
 
 {$ifndef CPUX86_64}
-  {$ERROR High res timer requires an intel compatible x86/64 CPU}
+  {$ERROR High resolution timer requires an intel compatible x86/64 CPU}
 {$endif}
 
 interface
@@ -33,6 +33,7 @@ type
     constructor Create;
     function NanoSeconds:QWord;inline;
     function MicroSeconds: QWord;inline;
+    function MilliSeconds: Double;inline;
     function GetCPUTick:QWord;assembler;nostackframe;
     function MeasureCPUSpeed: QWord;//in Mhz
     property CPUSpeed:QWord read FCPUSpeed;
@@ -41,8 +42,24 @@ type
     property CPUManifacturer:string read FCPUManifacturer;
 
   end;
+{$ifdef Profiling}
+
+  { TProfiler }
+
+  TProfiler=class
+    LogStr:string;
+    m_Start,m_LastLog,m_Elapsed:QWord;
+    procedure Log(const str:string);
+    procedure Start;
+    function Stop: QWord;
+  end;
+
+  var Profiler:TProfiler;
+{$endif}
+
 
   var HighResTimer:THighResTimer;
+
 implementation
 
 { THighResTimer }
@@ -82,6 +99,11 @@ begin
   result:=round(GetCPUTick/FCPUSpeed);
 end;
 
+function THighResTimer.MilliSeconds: Double;
+begin
+  result:=1000000*(GetCPUTick/FCPUSpeed)
+end;
+
 {$AsmMode intel}
 function THighResTimer.GetCPUTick: QWord; assembler;nostackframe;
 asm
@@ -91,8 +113,8 @@ asm
     shl rdx, 32
     or  rax, rdx
   {$else}
-//    shl $32,%edx
-//    or %edx,%eax
+    shl edx, 32
+    or  eax, edx
   {$endif}
 {$else}
 
@@ -122,10 +144,45 @@ begin
   result.a:=a;result.b:=b;result.c:=c;result.d:=d;
 end;
 
+
+{$ifdef Profiling}
+{ TProfiler }
+
+procedure TProfiler.Log(const str: string);
+begin
+
+   LogStr:=LogStr+format('Since Start[%3nms], Since LastLog[%3nms]: %s',[((HighResTimer.MicroSeconds - m_Start)/1000), (HighResTimer.MicroSeconds - m_LastLog)/1000, str])+LineEnding;
+   m_LastLog:=HighResTimer.MicroSeconds;
+end;
+
+procedure TProfiler.Start;
+begin
+  m_Start:=HighResTimer.MicroSeconds;
+  m_LastLog:=m_Start;
+  LogStr:='';
+end;
+
+function TProfiler.Stop:QWord;
+var m:QWord;
+begin
+  m:=HighResTimer.MicroSeconds;
+  m_Elapsed:=m - m_Start;
+  m_LastLog:=m - m_LastLog;
+  result:=m_Elapsed
+end;
+{$endif}
+
 initialization
   if not Assigned(HighResTimer) then
     HighResTimer:=THighResTimer.Create;
+  {$ifdef Profiling}
+  if not Assigned(Profiler) then
+    Profiler:=TProfiler.Create;
+  {$endif}
 finalization
   FreeandNil(HighResTimer);
+  {$ifdef Profiling}
+  FreeandNil(Profiler)
+  {$endif}
 end.
 

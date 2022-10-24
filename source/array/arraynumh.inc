@@ -10,7 +10,7 @@ type
  private
    procedure SetCount(AValue: integer);
   public
-   function reduce(func:{$ifdef fpc}specialize{$endif} TRecudeCallback<Number>;const init:Number=0):Number;_inline  overload;
+   function reduce(func:{$ifdef fpc}specialize{$endif} TReduceCallback<Number>;const init:Number=0):Number;_inline  overload;
    function reduce(func:{$ifdef fpc}specialize{$endif} TSimpleReduceCallback<Number>):Number; _inline               overload;
    function GetCount:Integer; _inline
    function Sort(const CompareFunc:{$ifdef fpc}specialize{$endif} TCompareFunc<Number> = nil):TNumberDynArray; _inline
@@ -133,7 +133,7 @@ type
    function GetCount: integer;     _inline
    procedure SetCount(AValue: integer);  _inline
  public
-   function reduce(func:{$ifdef fpc}specialize{$endif} TRecudeCallback<TNumberDynArray>;const init:TNumberDynArray=nil):TNumberDynArray; _inline    overload;
+   function reduce(func:{$ifdef fpc}specialize{$endif} TReduceCallback<TNumberDynArray>;const init:TNumberDynArray=nil):TNumberDynArray; _inline    overload;
    function reduce(func:{$ifdef fpc}specialize{$endif} TSimpleReduceCallback<TNumberDynArray>):TNumberDynArray;   _inline                           overload;
    function Sort(CompareFunc:{$ifdef fpc}specialize{$endif} TCompareFunc<TNumberDynArray> = nil):TNumberArrayArray;     _inline
    function Sorted(CompareFunc:{$ifdef fpc}specialize{$endif} TCompareFunc<TNumberDynArray> = nil):TNumberArrayArray;   _inline

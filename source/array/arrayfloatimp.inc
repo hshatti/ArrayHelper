@@ -51,7 +51,7 @@ begin
     end;
 end;
 
-function TFloatArrayHelper.reduce(func: {$ifdef fpc}specialize{$endif} TRecudeCallback<Float>;const init: Float): Float;_REDUCE_;
+function TFloatArrayHelper.reduce(func: {$ifdef fpc}specialize{$endif} TReduceCallback<Float>;const init: Float): Float;_REDUCE_;
 
 function TFloatArrayHelper.reduce(func: {$ifdef fpc}specialize{$endif} TSimpleReduceCallback<Float>): Float;_SIMPLEREDUCE_;
 
@@ -1697,7 +1697,7 @@ function TFloatArrayArrayHelper.GetCount: integer; _DOCOUNT_;
 
 procedure TFloatArrayArrayHelper.SetCount(AValue: integer); _SETCOUNT_;
 
-function TFloatArrayArrayHelper.reduce(func: {$ifdef fpc}specialize{$endif} TRecudeCallback<TFloatDynArray>; const init: TFloatDynArray): TFloatDynArray;_REDUCE_;
+function TFloatArrayArrayHelper.reduce(func: {$ifdef fpc}specialize{$endif} TReduceCallback<TFloatDynArray>; const init: TFloatDynArray): TFloatDynArray;_REDUCE_;
 
 function TFloatArrayArrayHelper.reduce(func: {$ifdef fpc}specialize{$endif} TSimpleReduceCallback<TFloatDynArray>): TFloatDynArray;_SIMPLEREDUCE_;
 
@@ -1751,7 +1751,7 @@ var i:integer;
 begin
   result:='';
   for i:=0 to Count-1 do
-    result:=Result+Seperator+#13#10+Self[i].ToString(Seperator) ;
+    result:=Result+Seperator+LineEnding+Self[i].ToString(Seperator) ;
   delete(result,1,Length(Seperator)+2);
   result:='['+result+']';
 end;

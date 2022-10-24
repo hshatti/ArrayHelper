@@ -4,6 +4,7 @@ unit ArrayHelper;
 {$H+}
 {$M-}
 {$ModeSwitch typehelpers}
+{$ModeSwitch advancedrecords}
 {$inline on}
 {$SafeFPUExceptions OFF}
 {$FPUTYPE avx2}
@@ -221,7 +222,6 @@ type
 
 type
 
-
   { TStringArrayHelper }
 
   TStringArrayHelper=type helper for TStringDynArray
@@ -232,7 +232,7 @@ type
   private
     procedure SetCount(AValue: integer);
   public
-    function reduce(func: {$ifdef fpc}specialize{$endif} TRecudeCallback<string>; const init: string): string;
+    function reduce(func: {$ifdef fpc}specialize{$endif} TReduceCallback<string>; const init: string): string;
     function GetCount:Integer;
     function Sort(const CompareFunc:TCompareFuncStr = nil):TStringDynArray;
     function Sorted(const CompareFunc:TCompareFuncStr = nil):TStringDynArray;
@@ -246,9 +246,7 @@ type
     //function Filter(func:{$ifdef fpc}specialize{$endif} TFilterFunc<string>):TStringDynArray;
     function FilterStr(val:string;partialMatch:boolean=true):TStringDynArray;
     function FilterText(val:string;partialMatch:boolean=true):TStringDynArray;
-    function indexOf(const val: string): integer;
     function Lookup(const val:string):integer;
-    class function fill(const cnt:integer;str:string):TStringDynArray;static;
     // heap operations are costy use them carfully
     function Push(v:string):string;
     function Pop():string;
@@ -256,6 +254,14 @@ type
     function Shift():string;
     function Slice(start,_end:integer):TStringDynArray;
     function Splice(start,deleteCount:integer;Items:TStringDynArray):TStringDynArray;
+    function concat(Items:TStringDynArray):TStringDynArray;
+    function unique():TStringDynArray;
+    function ToString(const Seperator: string=', '; const quote: string='"'): string;
+    property Count:integer read GetCount write SetCount;
+    function as2d(const Columns:integer;const Transposed:boolean=true):TStringArrayArray; _inline
+    function Transpose(const Width:integer):TStringDynArray;
+    function indexOf(const val: string): integer;
+    class function Fill(const cnt:integer;str:string):TStringDynArray;static;
     function Extract(const Indecies:TIntegerDynArray):TStringDynArray;
     procedure Scatter(const indecies:TIntegerDynArray;const Values:TStringDynArray);
     function Find(const func:{$ifdef fpc}specialize{$endif} TSimpleFilterCallBack<String>):TIntegerDynArray;   overload;
@@ -263,15 +269,8 @@ type
     function Find(const value:String):TIntegerDynArray;                                                        overload;
     function Intersect(const Other:TStringDynArray;const binSearch:boolean=false):TStringDynArray; _inline
     function Difference(const Other:TStringDynArray;const binSearch:boolean=false):TStringDynArray; _inline
-
     function Mode():string;
-    function concat(Items:TStringDynArray):TStringDynArray;
     function reverse():TStringDynArray;
-    function unique():TStringDynArray;
-    function ToString(const Seperator: string=', '; const quote: string='"'): string;
-    property Count:integer read GetCount write SetCount;
-    function as2d(const Columns:integer;const Transposed:boolean=true):TStringArrayArray; _inline
-    function Transpose(const Width:integer):TStringDynArray;
     function ToDoubles:TDoubleDynArray;
     function ToSingles:TSingleDynArray;
     function ToIntegers:TIntegerDynArray;
@@ -300,7 +299,7 @@ type
     function GetCount: integer;
     procedure SetCount(AValue: integer);
   public
-    function reduce(func:{$ifdef fpc}specialize{$endif} TRecudeCallback<TStringDynArray>;const init:TStringDynArray=nil):TStringDynArray;   overload;
+    function reduce(func:{$ifdef fpc}specialize{$endif} TReduceCallback<TStringDynArray>;const init:TStringDynArray=nil):TStringDynArray;   overload;
     function reduce(func:{$ifdef fpc}specialize{$endif} TSimpleReduceCallback<TStringDynArray>):TStringDynArray;                         overload;
     function Sort(CompareFunc:TCompareFuncStringAA= nil):TStringArrayArray;
     function Sorted(CompareFunc:TCompareFuncStringAA= nil):TStringArrayArray;
@@ -329,6 +328,116 @@ type
     class procedure QuickSort(var Arr: TStringArrayArray; const L, R: Longint;const Compare: TCompareFuncStringAA); static;
     class function uniqueFilt(const a:TStringDynArray;const i:integer;arr:PStringArray):boolean;static;
   end;
+
+
+  TVariantArrayHelper=type helper for TVariantArray
+  type
+
+    PPType=^PType;
+    PType=^TType;
+    TType=Variant;
+    TSelf=TVariantArray;
+    TCompare={$ifdef fpc}specialize{$endif} TComparefunc<TType>;
+  private
+    function GetCount: integer;
+    procedure SetCount(AValue: integer);
+  public
+    function reduce(func:{$ifdef fpc}specialize{$endif} TReduceCallback<TType>;const init:TType):TType;   overload;
+    function reduce(func:{$ifdef fpc}specialize{$endif} TSimpleReduceCallback<TType>):TType;                         overload;
+    function Sort(CompareFunc:TCompare= nil):TSelf;
+    function Sorted(CompareFunc:TCompare= nil):TSelf;
+    function Lookup(const val:TType):integer;
+    function Map(func:{$ifdef fpc}specialize{$endif} TMapCallback<TType>):TSelf;          overload;
+    function Map(func:{$ifdef fpc}specialize{$endif} TSimpleMapCallback<TType>):TSelf;    overload;
+    function Map(func:{$ifdef fpc}specialize{$endif} TSimpleMapCallbackNested<TType>):TSelf;    overload;
+    function Filter(func:{$ifdef fpc}specialize{$endif} TFilterCallback<TType, PType>):TSelf;
+    function unique():TSelf;
+    property Count:integer read GetCount write SetCount;
+    // heap operations are costy use carfully
+    function Push(v:TType):TType;
+    function Pop():TType;
+    function UnShift(v:TType):TType;
+    function Shift():TType;
+    function Slice(start,_end:integer):TSelf;
+    function Splice(start,deleteCount:integer;Items:TSelf):TSelf;
+    function concat(Items:TSelf):TSelf;
+
+    function indexOf(const val: TType): integer;        overload;
+    function indexOf(const val: string): integer;       overload;
+    class function Fill(const cnt:integer;val:TType):TSelf;static;
+    function Extract(const Indecies:TIntegerDynArray):TSelf;
+    procedure Scatter(const indecies:TIntegerDynArray;const Values:TSelf);
+    function Find(const func:{$ifdef fpc}specialize{$endif} TSimpleFilterCallBack<TType>):TIntegerDynArray;   overload;
+    function Find(const values:TSelf):TIntegerDynArray;                                              overload;
+    function Find(const value:TType):TIntegerDynArray;                                                        overload;
+    function Intersect(const Other:TSelf;const binSearch:boolean=false):TSelf; _inline
+    function Difference(const Other:TSelf;const binSearch:boolean=false):TSelf; _inline
+    function Mode():TType;
+    function reverse():TSelf;
+    function ToString(const Seperator: string=', '; const quote: string='"';const Brackets:boolean=true): string;
+    class function cmp(const a, b: TType): integer;static;
+    class procedure QuickSort(var Arr: TSelf; const L, R: Longint;const Compare: TCompare); static;
+    class function uniqueFilt(const a:TType;const i:integer;arr:PType):boolean;static;
+
+  end;
+
+  TVariantArray2DHelper=type helper for TVariantArrayArray
+  type
+
+    PPType=^PType;
+    PType=^TType;
+    TType=TVariantArray;
+    TSelf=TVariantArrayArray;
+    TCompare={$ifdef fpc}specialize{$endif} TComparefunc<TType>;
+  private
+    function GetCount: integer;
+    procedure SetCount(AValue: integer);
+  public
+    function reduce(func:{$ifdef fpc}specialize{$endif} TReduceCallback<TType>;const init:TType):TType;   overload;
+    function reduce(func:{$ifdef fpc}specialize{$endif} TSimpleReduceCallback<TType>):TType;                         overload;
+    function Sort(CompareFunc:TCompare= nil):TSelf;
+    function Sorted(CompareFunc:TCompare= nil):TSelf;
+    function Lookup(const val:TType):integer;
+    function Map(func:{$ifdef fpc}specialize{$endif} TMapCallback<TType>):TSelf;          overload;
+    function Map(func:{$ifdef fpc}specialize{$endif} TSimpleMapCallback<TType>):TSelf;    overload;
+    function Map(func:{$ifdef fpc}specialize{$endif} TSimpleMapCallbackNested<TType>):TSelf;    overload;
+    function Filter(func:{$ifdef fpc}specialize{$endif} TFilterCallback<TType, PType>):TSelf;
+    function unique():TSelf;
+    property Count:integer read GetCount write SetCount;
+    function Transpose:TSelf;
+    // heap operations are costy use carfully
+    function Push(v:TType):TType;
+    function Pop():TType;
+    function UnShift(v:TType):TType;
+    function Shift():TType;
+    function Slice(start,_end:integer):TSelf;
+    function Splice(start,deleteCount:integer;Items:TSelf):TSelf;
+    function concat(Items:TSelf):TSelf;
+    function ToString(const Seperator: string=', '; const quote: string='"';const Brackets:boolean=true): string;
+    class function cmp(const a, b: TType): integer;static;
+    class procedure QuickSort(var Arr: TSelf; const L, R: Longint;const Compare: TCompare); static;
+    class function uniqueFilt(const a:TType;const i:integer;arr:PType):boolean;static;
+
+  end;
+
+
+{ TKeyValueList<TK,TR> }
+{$ifdef fpc}generic{$endif} TKeyValueList<TK,TV>=record
+  type
+    PK= array of TK;
+  var
+    Keys:{$ifdef fpc}specialize{$endif} TArray<TK>;
+    ValueList:{$ifdef fpc}specialize{$endif} TArray<TV>;
+  private
+    function GetValues(const key: TK): TV;
+    procedure SetValues(const key: TK; const AValue: TV);
+  public
+    function KeyExists(key: TK): boolean;
+    property Values[key:TK]:TV read GetValues write SetValues ;default;
+    function Count:integer;
+    procedure Remove(const index:integer);
+  end;
+
 
 {$ifdef fpc}
 operator :=(const Arr:TStringDynArray):string;
@@ -381,7 +490,7 @@ operator +(const v: TStringDynArray ;const Arr: TStringArrayArray  ): TStringArr
 //{$ifdef fpc}generic{$endif} procedure Divide<T>( dst,a:array of T;const b:T);      overload;
 //{$ifdef fpc}generic{$endif} procedure DivInt<T>( dst,a:array of T;const b:T);      overload;
 //{$ifdef fpc}generic{$endif} procedure ModInt<T>( dst,a:array of T;const b:T);      overload;
-{$ifdef fpc}generic{$endif} function Push<T>(var Self:array of T;const v:T):T;
+{$ifdef fpc}generic{$endif} function Push<T>(var Self:{$ifdef fpc}specialize{$endif} TArray<T>;const v:T):T;
 {$ifdef fpc}generic{$endif} function Pop<T>(var Self:array of T):T;
 {$ifdef fpc}generic{$endif} function Shift<T>(var Self:array of T):T;
 {$ifdef fpc}generic{$endif} function UnShift<T>(var Self:array of T;const v:T):T;
@@ -398,8 +507,11 @@ operator +(const v: TStringDynArray ;const Arr: TStringArrayArray  ): TStringArr
 
 
 
-{$ifdef fpc}generic{$endif} function Reduce<T>(const Self:array of T;func:{$ifdef fpc}specialize{$endif} TRecudeCallback<T>;const init:T=nil):T;
-{$ifdef fpc}generic{$endif} procedure Reverse<ARR,T>(const Self:ARR; const  N : integer);
+{$ifdef fpc}generic{$endif} function Reduce<T>(const Self:array of T;func:{$ifdef fpc}specialize{$endif} TReduceCallback<T>;const init:T):T;            overload;
+{$ifdef fpc}generic{$endif} function Reduce<T>(const Self:array of T;func:{$ifdef fpc}specialize{$endif} TSimpleReduceCallback<T>;const init:T):T;      overload;
+{$ifdef fpc}generic{$endif} function Reduce<T>(const Self:array of T;func:{$ifdef fpc}specialize{$endif} TReduceCallback<T>):T;      overload;
+
+{$ifdef fpc}generic{$endif} procedure Reverse<T>(const Self:{$ifdef fpc}specialize{$endif}TArray<T>; const  N : integer);
 {$ifdef fpc}generic{$endif} function Map<T,R>(const Self:array of T;func: {$ifdef fpc}specialize{$endif} TMapCallbackR<T,R>):{$ifdef fpc}specialize {$endif}TArray<R>;  overload;
 {$ifdef fpc}generic{$endif} function Filter<ARR,T>(const Self:ARR;const func:{$ifdef fpc}specialize {$endif}TFilterCallback<T,ARR>):ARR;     overload;
 
@@ -411,12 +523,339 @@ operator +(const v: TStringDynArray ;const Arr: TStringArrayArray  ): TStringArr
 {$ifdef fpc}generic {$endif}function MaxNumber<T>(const Data:array of T):T;overload;
 {$ifdef fpc}generic {$endif}function MinNumber<T>(const Data:array of T):T;overload;
 {$ifdef fpc}generic {$endif}function SumNumber<T, R>(const Data:array of T):R;overload;
+{$ifdef fpc}generic{$endif} function Mode<T>(const Self:array of T):T;
+
 //{$ifdef fpc}generic {$endif}function SumNumber<T>(const Data:array of T):T;overload;
 
 function dotest(pa:integer):string;
 
 implementation
+{ TKeyValueList }
 
+function TKeyValueList{$ifndef fpc}<TK,TV>{$endif}.Count: integer;
+begin
+  result:=Length(Keys)
+end;
+
+procedure TKeyValueList{$ifndef fpc}<TK,TV>{$endif}.Remove(const index: integer);
+begin
+  if (index>=0) and (index<Count) then begin
+    Delete(Keys,index,1);
+    Delete(ValueList,index,1);
+  end;
+end;
+
+function TKeyValueList{$ifndef fpc}<TK,TV>{$endif}.GetValues(const key: TK): TV;
+var i:integer;
+begin
+  i:={$ifdef fpc}specialize{$endif} _BinSearch<TK, PK>(Keys ,key,Length(Keys));
+  if i>=0 then
+    result:=ValueList[i]
+end;
+
+procedure TKeyValueList{$ifndef fpc}<TK,TV>{$endif}.SetValues(const key: TK; const AValue: TV);
+var i:integer;
+begin
+  i:={$ifdef fpc}specialize{$endif} _BinSearch<TK,PK>(Keys,key,Length(Keys));
+  if i<0 then
+    begin
+      i:=-(i+1);
+      Insert(key, Keys,i);
+      Insert(AValue,ValueList,i)
+    end
+  else
+    //begin
+      ValueList[i]:=AValue
+    //end;
+end;
+
+function TKeyValueList{$ifndef fpc}<TK,TV>{$endif}.KeyExists(key: TK): boolean;
+begin
+  result:={$ifdef fpc}specialize{$endif} _BinSearch<TK,PK>(Keys,key,Length(Keys))>=0;
+end;
+
+{ TVariantArrayHelper }
+
+procedure TVariantArrayHelper.SetCount(AValue: integer);
+begin
+  SetLength(Self,AValue)
+end;
+
+function TVariantArrayHelper.GetCount: integer;
+begin
+  result:=Length(Self)
+end;
+
+function TVariantArrayHelper.reduce(func:{$ifdef fpc}specialize{$endif} TReduceCallback<TType>;const init:TType):TType; _REDUCE_;
+//begin
+//  result:=ArrayHelper.Reduce<TType>(Self,Func,init)
+//end;
+
+function TVariantArrayHelper.reduce(func:{$ifdef fpc}specialize{$endif} TSimpleReduceCallback<TType>):TType;  _SIMPLEREDUCE_;
+//begin
+//
+//end;
+//
+function TVariantArrayHelper.Sort(CompareFunc:TCompare):TSelf;   _DOSORT_;
+//begin
+//
+//end;
+
+function TVariantArrayHelper.Sorted(CompareFunc:TCompare):TSelf; _SORTED_;
+//begin
+//
+//end;
+
+function TVariantArrayHelper.Lookup(const val:TType):integer;
+begin
+  result:={$ifdef fpc}specialize{$endif} _BinSearch<TType,PType>(@Self[0],Val,Length(Self),TCompare({$ifdef fpc}@{$endif}Self.cmp));
+
+end;
+
+function TVariantArrayHelper.Map(func:{$ifdef fpc}specialize{$endif} TMapCallback<TType>):TSelf;   _DOMAP_;
+//begin
+//
+//end;
+
+function TVariantArrayHelper.Map(func:{$ifdef fpc}specialize{$endif} TSimpleMapCallback<TType>):TSelf;   _SIMPLEMAP_  ;
+//begin
+//
+//end;
+
+function TVariantArrayHelper.Map(func:{$ifdef fpc}specialize{$endif} TSimpleMapCallbackNested<TType>):TSelf;   _SIMPLEMAP_;
+//begin
+//
+//end;
+
+function TVariantArrayHelper.Filter(func:{$ifdef fpc}specialize{$endif} TFilterCallback<TType, PType>):TSelf;_FILTER_;
+
+function TVariantArrayHelper.unique():TSelf;
+begin
+  result:=Self.Sorted().Filter({$ifdef fpc}specialize{$endif} TFilterCallback<TType,PType>({$ifdef fpc}@{$endif}uniqueFilt));
+
+end;
+
+function TVariantArrayHelper.Push(v:TType):TType;     _PUSH_;
+//begin
+//
+//end;
+
+function TVariantArrayHelper.Pop():TType;            _POP_;
+//begin
+//
+//end;
+
+function TVariantArrayHelper.UnShift(v:TType):TType;         _UNSHIFT_;
+//begin
+//
+//end;
+
+function TVariantArrayHelper.Shift():TType;                 _SHIFT_;
+//begin
+//
+//end;
+
+function TVariantArrayHelper.Slice(start,_end:integer):TSelf;   //   _SLICE_;
+var i,C:integer;
+begin
+  C:=Length(Self);
+  if start<0 then start:=C+start;
+  if _end<0 then _end:=C + _end;
+  result:=copy(Self,start,_end - start)
+end ;
+
+function TVariantArrayHelper.Splice(start,deleteCount:integer;Items:TVariantArray):TSelf;   _SPLICE_ ;
+//begin
+//
+//end;
+
+function TVariantArrayHelper.concat(Items:TSelf):TSelf;                                 //  _CONCAT_;
+var l,i,C:integer;
+begin
+  C:=Length(Self);
+  l:=Length(Items);
+  setLength(Result,C+l);
+  if (Self<>Result) and (C>0)then Move(Self[0],Result[0],C*SizeOf(Result[0]));
+  for i:=0 to l-1 do Result[C+i]:=Items[i]
+end;
+
+function TVariantArrayHelper.indexOf(const val: TType): integer;   _INDEXOF_;
+
+function TVariantArrayHelper.indexOf(const val: string): integer;
+var i:integer;
+begin
+  result:=-1;
+  for i:=0 to High(Self) do
+    if string(Self[i])=val then begin
+      result:=i;
+      exit;
+    end;
+end;
+
+class function TVariantArrayHelper.Fill(const cnt:integer;val:TType):TSelf;
+begin
+  result:={$ifdef fpc}specialize{$endif} Fill<TType>(cnt,val)
+end;
+
+function TVariantArrayHelper.Extract(const Indecies:TIntegerDynArray):TSelf;
+begin
+    result:={$ifdef fpc}specialize{$endif} Extract<TSelf>(Self,indecies);
+end;
+
+procedure TVariantArrayHelper.Scatter(const indecies:TIntegerDynArray;const Values:TSelf);
+begin
+  {$ifdef fpc}specialize{$endif}Scatter<TSelf>(Self,indecies,Values);
+end;
+
+function TVariantArrayHelper.Find(const func:{$ifdef fpc}specialize{$endif} TSimpleFilterCallBack<TType>):TIntegerDynArray;
+begin
+  result:={$ifdef fpc}specialize{$endif} Find<TType>(Self,func)
+end;
+
+function TVariantArrayHelper.Find(const values:TSelf):TIntegerDynArray;
+begin
+  result:={$ifdef fpc}specialize{$endif} Find<TType>(Self,Values)
+end;
+
+function TVariantArrayHelper.Find(const value:TType):TIntegerDynArray;
+begin
+  result:={$ifdef fpc}specialize{$endif} Find<TType>(Self,Value)
+end;
+
+function TVariantArrayHelper.Intersect(const Other:TSelf;const binSearch:boolean=false):TSelf;
+begin
+  result:={$ifdef fpc}specialize{$endif} Intersect<TType>(Self,Other,BinSearch)
+end;
+
+function TVariantArrayHelper.Difference(const Other:TSelf;const binSearch:boolean=false):TSelf;
+begin
+  result:={$ifdef fpc}specialize{$endif} Difference<TType>(Self,Other,BinSearch)
+end;
+
+function TVariantArrayHelper.Mode():TType;
+begin
+  result:={$ifdef fpc}specialize{$endif} Mode<TType>(Self)
+end;
+
+function TVariantArrayHelper.reverse():TSelf; _REVERSE_;
+
+function TVariantArrayHelper.ToString(const Seperator: string=', '; const quote: string='"';const Brackets:boolean=true): string;
+var i:integer;
+begin
+  result:='';
+  for i:=0 to Count-1 do
+    result:=Result+Seperator+quote+string(Self[i])+quote ;
+  delete(result,1,Length(Seperator));
+  if Brackets then result:='['+result+']';
+end;
+
+class function TVariantArrayHelper.cmp(const a, b: TType): integer;
+begin
+  result:=1;
+  if a<b then result:=-1
+  else if a=b then result:=0
+end;
+
+class procedure TVariantArrayHelper.QuickSort(var Arr: TSelf; const L, R: Longint;const Compare: TCompare); static;
+begin
+  {$ifdef fpc}specialize{$endif} _QuickSort<TType,PType>(@Arr[0],L,R,Compare)  ;
+end;
+
+class function TVariantArrayHelper.uniqueFilt(const a:TType;const i:integer;arr:PType):boolean;static;
+begin
+  result:=true;
+  if i>0 then
+    result:=cmp(a,arr[i-1])<>0;
+end;
+
+
+procedure TVariantArray2DHelper.SetCount(AValue: integer);
+begin
+  SetLength(Self,AValue)
+end;
+
+function TVariantArray2DHelper.GetCount: integer;
+begin
+  Result:=Length(Self)
+end;
+
+function TVariantArray2DHelper.reduce(func:{$ifdef fpc}specialize{$endif} TReduceCallback<TType>;const init:TType):TType;  _REDUCE_;
+
+
+function TVariantArray2DHelper.reduce(func:{$ifdef fpc}specialize{$endif} TSimpleReduceCallback<TType>):TType;  _SIMPLEREDUCE_;
+
+function TVariantArray2DHelper.Sort(CompareFunc:TCompare= nil):TSelf;  _DOSORT_;
+
+function TVariantArray2DHelper.Sorted(CompareFunc:TCompare= nil):TSelf;  _SORTED_;
+
+function TVariantArray2DHelper.Lookup(const val:TType):integer;
+begin
+  result:={$ifdef fpc}specialize{$endif} _BinSearch<TType,PType>(@Self[0],Val,Length(Self),TCompare({$ifdef fpc}@{$endif}Self.cmp));
+end;
+
+function TVariantArray2DHelper.Map(func:{$ifdef fpc}specialize{$endif} TMapCallback<TType>):TSelf;   _DOMAP_;
+
+function TVariantArray2DHelper.Map(func:{$ifdef fpc}specialize{$endif} TSimpleMapCallback<TType>):TSelf;   _SIMPLEMAP_;
+
+function TVariantArray2DHelper.Map(func:{$ifdef fpc}specialize{$endif} TSimpleMapCallbackNested<TType>):TSelf;   _SIMPLEMAP_;
+
+function TVariantArray2DHelper.Filter(func:{$ifdef fpc}specialize{$endif} TFilterCallback<TType, PType>):TSelf;   _FILTER_;
+
+function TVariantArray2DHelper.unique():TSelf;
+begin
+    result:=Self.Sorted().Filter({$ifdef fpc}specialize{$endif} TFilterCallback<TType,PType>({$ifdef fpc}@{$endif}uniqueFilt));
+end;
+
+function TVariantArray2DHelper.Transpose:TSelf;   _TRANSPOSE_;
+
+function TVariantArray2DHelper.Push(v:TType):TType;    _PUSH_;
+
+function TVariantArray2DHelper.Pop():TType;                   _POP_;
+
+function TVariantArray2DHelper.UnShift(v:TType):TType;       _UNSHIFT_  ;
+
+function TVariantArray2DHelper.Shift():TType;                         _SHIFT_;
+
+function TVariantArray2DHelper.Slice(start,_end:integer):TSelf;       _SLICE_;
+
+function TVariantArray2DHelper.Splice(start,deleteCount:integer;Items:TSelf):TSelf;  _SPLICE_;
+
+function TVariantArray2DHelper.concat(Items:TSelf):TSelf;                _CONCAT_;
+
+function TVariantArray2DHelper.ToString(const Seperator: string; const quote: string; const Brackets:boolean): string;
+var i:integer;
+begin
+  result:='';
+  for i:=0 to Count-1 do
+    result:=Result+Seperator+LineEnding+Self[i].ToString(Seperator,Quote, Brackets) ;
+  delete(result,1,Length(Seperator)+2);
+  if Brackets then result:='['+result+']';
+end;
+
+
+class function TVariantArray2DHelper.cmp(const a, b: TType): integer;static;
+var i:integer ;
+begin
+  for i:=0 to Min(high(a),high(b)) do begin
+    result:=TType.cmp(a[i],b[i]);
+    if result<>0 then exit;
+  end;
+  if Length(a)>Length(b) then result:=1
+  else if Length(a)<Length(b) then result:=-1
+  else result:=0;
+end;
+
+class procedure TVariantArray2DHelper.QuickSort(var Arr: TSelf; const L, R: Longint;const Compare: TCompare); static;
+begin
+  {$ifdef fpc}specialize{$endif} _QuickSort<TType,PType>(@Arr[0],L,R,Compare)  ;
+end;
+
+class function TVariantArray2DHelper.uniqueFilt(const a:TType;const i:integer;arr:PType):boolean;static;
+begin
+  result:=true;
+  if i>0 then
+    result:=cmp(a,arr[i-1])<>0;
+end;
 
 
 {$ifdef fpc}generic {$endif}function MaxNumber<T>(const Data:array of T):T;
@@ -466,7 +905,16 @@ end;
 //{$ifdef fpc}generic{$endif} procedure DivInt<T>( dst,a:array of T;const b:T);       var i:integer;   begin  for i:=0 to High(dst) do dst[i]:=a[i] div b end;
 //{$ifdef fpc}generic{$endif} procedure ModInt<T>( dst,a:array of T;const b:T);       var i:integer;   begin  for i:=0 to High(dst) do dst[i]:=a[i] mod b end;
 
-{$ifdef fpc}generic{$endif} function Push<T>(var Self:array of T;const v:T):T;                                        _PUSH_;
+{$ifdef fpc}generic{$endif} function Push<T>(var Self:{$ifdef fpc}specialize{$endif} TArray<T>;const v:T):T;                     //                   _PUSH_;
+//var C:integer;
+begin
+  insert(v,Self,length(Self))
+  //c:=Length(Self)+1;
+  //setLength(Self,C);
+  //Self[C-1]:=v;
+  //result:=v
+end;
+
 {$ifdef fpc}generic{$endif} function Pop<T>(var Self:array of T):T;                                                   _POP_;
 {$ifdef fpc}generic{$endif} function Shift<T>(var Self:array of T):T;                                                 _SHIFT_;
 {$ifdef fpc}generic{$endif} function UnShift<T>(var Self:array of T;const v:T):T;                                     _UNSHIFT_;
@@ -475,8 +923,44 @@ end;
 {$ifdef fpc}generic{$endif} function Slice<ARR>(const Self:ARR; start,_end:integer):ARR;                              _SLICE_;
 {$ifdef fpc}generic{$endif} function Extract<ARR>(const Self:ARR; const Indecies:TIntegerDynArray):ARR;               _EXTRACT_;
 {$ifdef fpc}generic{$endif} procedure Scatter<ARR>(const Self:ARR; const Indecies:TIntegerDynArray;const Values:ARR); _SCATTER_;
-{$ifdef fpc}generic{$endif} function Reduce<T>(const Self:array of T;func:{$ifdef fpc}specialize{$endif} TRecudeCallback<T>;const init:T=nil):T;  _REDUCE_;
-{$ifdef fpc}generic{$endif} procedure Reverse<ARR,T>(const Self:ARR; const  N : integer);
+{$ifdef fpc}generic{$endif} function Reduce<T>(const Self:array of T;func:{$ifdef fpc}specialize{$endif} TReduceCallback<T>;const init:T):T;  //_REDUCE_;
+var i,l:integer;
+begin
+  l:=Length(Self);
+  if l>0 then
+    result:=func(init,self[0],0,Self);
+  if l>1 then
+     begin
+//       result:=self[0];
+       for i:=1 to l-1 do
+         result:=func(result,self[i],i,self)
+     end
+end;
+
+{$ifdef fpc}generic{$endif} function Reduce<T>(const Self:array of T;func:{$ifdef fpc}specialize{$endif} TSimpleReduceCallback<T>;const init:T):T;//  _SIMPLEREDUCE_;
+var i,l:integer;
+begin
+  l:=Length(Self);
+  if l>0 then
+    result:=func(init,self[0]);
+  if l>1 then
+     begin
+//       result:=self[0];
+       for i:=1 to l-1 do
+         result:=func(result,self[i])
+     end
+end;
+
+{$ifdef fpc}generic{$endif} function Reduce<T>(const Self:array of T;func:{$ifdef fpc}specialize{$endif} TReduceCallback<T>):T;//  _SIMPLEREDUCE_;
+var i:integer;
+begin
+  if High(Self)>-1 then
+    result:=Self[0];
+  for i:=1 to high(self) do
+    result:=func(result,Self[i],i,Self)
+end;
+
+{$ifdef fpc}generic{$endif} procedure Reverse<T>(const Self:{$ifdef fpc}specialize{$endif}TArray<T>; const  N : integer);
 var first,last:integer; v:T;
 begin
   first :=0;  last := N-1;
@@ -502,9 +986,22 @@ end;
 
 {$ifdef fpc}generic{$endif} function IndexOf<T>(const Self:array of T; const val:T):integer;                         _INDEXOF_;
 {$ifdef fpc}generic{$endif} function IndexOf<ARR,T>(const Self:ARR;    const val:T;  const aCount:integer):integer;var i:integer;     begin result := -1 ; for i:=0 to aCount-1 do if Self[i]=val then exit(i) end;
-{$ifdef fpc}generic{$endif} procedure Fill<T>(Self:array of T;const Val:T); var i:integer;                           begin for i:=0 to High(Self) do Self[i]:=Val end;
-{$ifdef fpc}generic{$endif} procedure Fill<ARR,T>(Self:ARR;const aCount:integer;const Val:T); var i:integer;         begin for i:=0 to aCount-1 do Self[i]:=Val end;
-{$ifdef fpc}generic{$endif} function Fill<T>(const aCount:integer;const Val:T):{$ifdef fpc}specialize {$endif}TArray<T>; var i:integer;         begin setLength(result,aCount);for i:=0 to aCount-1 do result[i]:=Val end;
+{$ifdef fpc}generic{$endif} procedure Fill<T>(Self:array of T;const Val:T); var i:integer;
+begin
+  for i:=0 to High(Self) do Self[i]:=Val
+end;
+
+{$ifdef fpc}generic{$endif} procedure Fill<ARR,T>(Self:ARR;const aCount:integer;const Val:T); var i:integer;
+begin
+  for i:=0 to aCount-1 do Self[i]:=Val
+end;
+
+{$ifdef fpc}generic{$endif} function Fill<T>(const aCount:integer;const Val:T):{$ifdef fpc}specialize {$endif}TArray<T>;
+var i:integer;
+begin
+  setLength(result,aCount);
+  for i:=0 to aCount-1 do result[i]:=Val
+end;
 
 
 {$ifdef fpc}generic{$endif} function Find<T>(const Self:array of T; const func:{$ifdef fpc}specialize{$endif} TSimpleFilterCallback<T>):TIntegerDynArray;  _FIND_;
@@ -556,6 +1053,27 @@ begin
         inc(j)
       end;
   setLength(result,j)
+end;
+
+{$ifdef fpc}generic{$endif} function Mode<T>(const Self:array of T):T;
+var
+  i,r,c:integer;
+  LS:{$ifdef fpc}specialize {$endif}TKeyValueList<T,integer>;
+begin
+  r:=0;
+  for i:=0 to High(Self) do begin
+    if LS.KeyExists(Self[i]) then
+      c:=LS[Self[i]]+1
+    else
+      c:=1;
+    LS[Self[i]]:=c;
+    if r<c then begin
+      r:=c;
+      result:=Self[i]
+    end;
+    if c=551 then
+      beep
+  end;
 end;
 
 
@@ -752,7 +1270,7 @@ function TStringArrayArrayHelper.GetCount: integer;_DOCOUNT_;
 
 procedure TStringArrayArrayHelper.SetCount(AValue: integer);_SETCOUNT_;
 
-function TStringArrayArrayHelper.reduce(func: {$ifdef fpc}specialize{$endif} TRecudeCallback<TStringDynArray>;const init: TStringDynArray): TStringDynArray;_REDUCE_;
+function TStringArrayArrayHelper.reduce(func: {$ifdef fpc}specialize{$endif} TReduceCallback<TStringDynArray>;const init: TStringDynArray): TStringDynArray;_REDUCE_;
 
 function TStringArrayArrayHelper.reduce(func: {$ifdef fpc}specialize{$endif} TSimpleReduceCallback<TStringDynArray>): TStringDynArray;_SIMPLEREDUCE_;
 
@@ -797,7 +1315,7 @@ var i:integer;
 begin
   result:='';
   for i:=0 to Count-1 do
-    result:=Result+Seperator+#13#10+Self[i].ToString(Seperator,Quote) ;
+    result:=Result+Seperator+LineEnding+Self[i].ToString(Seperator,Quote) ;
   delete(result,1,Length(Seperator)+2);
   result:='['+result+']';
 end;
@@ -854,7 +1372,7 @@ end;
 
 procedure TStringArrayHelper.SetCount(AValue: integer); _SETCOUNT_;
 
-function TStringArrayHelper.reduce(func: {$ifdef fpc}specialize{$endif} TRecudeCallback<string>; const init: string): string; _REDUCE_;
+function TStringArrayHelper.reduce(func: {$ifdef fpc}specialize{$endif} TReduceCallback<string>; const init: string): string; _REDUCE_;
 
 function TStringArrayHelper.GetCount: Integer;   _DOCOUNT_;
 
@@ -1001,7 +1519,7 @@ function TStringArrayHelper.Find(const value:String):TIntegerDynArray;          
 
 function TStringArrayHelper.concat(Items: TStringDynArray): TStringDynArray; _CONCAT_;
 
-class function TStringArrayHelper.fill(const cnt:integer;str:string):TStringDynArray;
+class function TStringArrayHelper.Fill(const cnt:integer;str:string):TStringDynArray;
 var i:integer;
 begin
   setLength(Result,cnt);

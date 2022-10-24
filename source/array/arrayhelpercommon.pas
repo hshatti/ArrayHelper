@@ -9,6 +9,7 @@ uses
 type
 
   TVariantArray=array of variant;
+  TVariantArrayArray=array of TVariantArray;
   TByteArrayArray=array of TByteDynArray;
   TShortArrayArray=array of TShortIntDynArray;
   TIntegerArrayArray=array of TIntegerDynArray;
@@ -20,18 +21,19 @@ type
   TCompArrayArray=array of TCompDynArray;
   TStringArrayArray=array of TStringDynArray;
 
-  TProcData=procedure(const opt:pointer;const Id, Stride,Count:integer);
-  TProcFFF=procedure(const dst,a,b:pSingle;const count:integer);
-  TProcDDD=procedure(const dst,a,b:pDouble;const count:integer);
-  TProcFFV=procedure(const dst,a:pSingle;const b:Single;const count:integer);
-  TProcDDV=procedure(const dst,a:pDouble;const b:Double;const count:integer);
-  TFuncFFV=function(const dst,a:pSingle;const count:integer):single;
-  TFuncDDV=function(const dst,a:pDouble;const count:integer):Double;
+  //TProcData=procedure(const opt:pointer;const Id, Stride,Count:integer);
+  //TProcFFF=procedure(const dst,a,b:pSingle;const count:integer);
+  //TProcDDD=procedure(const dst,a,b:pDouble;const count:integer);
+  //TProcFFV=procedure(const dst,a:pSingle;const b:Single;const count:integer);
+  //TProcDDV=procedure(const dst,a:pDouble;const b:Double;const count:integer);
+  //TFuncFFV=function(const dst,a:pSingle;const count:integer):single;
+  //TFuncDDV=function(const dst,a:pDouble;const count:integer):Double;
 
   TDateTimeArray= array of TDateTime;
-  {$ifdef fpc}generic{$endif} TRecudeCallback<T> = function(const a,b:T;const i:integer;arr:array of T):T;
-  {$ifdef fpc}generic{$endif} TRecudeCallbackNested<T> = function(const a,b:T;const i:integer;arr:array of T):T is Nested;
-  {$ifdef fpc}generic{$endif} TSimpleReduceCallback<T>=function(a,b:T):T;
+  {$ifdef fpc}generic{$endif} TReduceCallback<T> = function(const a,b:T;const i:integer;const arr:array of T):T;
+  {$ifdef fpc}generic{$endif} TReduceCallbackNested<T> = function(const a,b:T;const i:integer;const arr:array of T):T is Nested;
+  {$ifdef fpc}generic{$endif} TSimpleReduceCallback<T>=function(const a,b:T):T;
+  {$ifdef fpc}generic{$endif} TSimpleReduceCallbackNested<T>=function(const a,b:T):T is nested;
   {$ifdef fpc}generic{$endif} TComparefunc<T> = function(const a,b:T):integer ;
   {$ifdef fpc}generic{$endif} TComparefuncNested<T> = function(const a,b:T):integer is nested;
   {$ifdef fpc}generic{$endif} TMapCallBack<T>=function (const a:T;i:Integer;Arr:array of T):T;
@@ -296,7 +298,8 @@ var
 begin
   isFound := false;
   result:=-1;
-  if not assigned(Compare) then Compare:={$ifdef fpc}@{$endif}cmp;
+  if not assigned(Compare) then
+    Compare:={$ifdef fpc}@{$endif}cmp;
   // Use binary search.
   L := 0;
   R := R - 1;
