@@ -828,7 +828,7 @@ begin
   result:='';
   for i:=0 to Count-1 do
     result:=Result+Seperator+LineEnding+Self[i].ToString(Seperator,Quote, Brackets) ;
-  delete(result,1,Length(Seperator)+2);
+  delete(result,1,Length(Seperator)+1);
   if Brackets then result:='['+result+']';
 end;
 
