@@ -16,7 +16,7 @@ interface
 
 uses
   Classes, SysUtils, Types, Math,ArrayHelperCommon,{$ifdef use_lcl_complex}ucomplex,{$endif}complexarray,
-  fpexprpars, hirestimer, strutils
+  fpexprpars, hirestimer, strutils, TypInfo
   {$if defined(darwin) and defined(USE_VDSP)} , vDSP{$endif}
   {$ifdef USE_AVX2}, oprs_simd {$endif}
   //{$ifdef USE_AVX2}, pblas {$endif}
@@ -234,9 +234,10 @@ type
   public
     function reduce(func: {$ifdef fpc}specialize{$endif} TReduceCallback<string>; const init: string): string;
     function GetCount:Integer;
-    function Sort(const CompareFunc:TCompareFuncStr = nil):TStringDynArray;
-    function Sorted(const CompareFunc:TCompareFuncStr = nil):TStringDynArray;
+    function Sort(const Descending:boolean=false; const CompareFunc:TCompareFuncStr = nil):TStringDynArray;
+    function Sorted(const Descending:boolean=false; const CompareFunc:TCompareFuncStr = nil):TStringDynArray;
     function isSorted(const descending:boolean =false; CompareFunc:TCompareFuncStr = nil):boolean;
+    function SortText():TStringDynArray;   // case insensitive sorting
 
     function Map(func:{$ifdef fpc}specialize{$endif} TMapCallback<string>):TStringDynArray;          overload;
     function Map(func:{$ifdef fpc}specialize{$endif} TSimpleMapCallback<string>):TStringDynArray;    overload;
@@ -246,7 +247,7 @@ type
     //function Filter(func:{$ifdef fpc}specialize{$endif} TFilterFunc<string>):TStringDynArray;
     function FilterStr(val:string;partialMatch:boolean=true):TStringDynArray;
     function FilterText(val:string;partialMatch:boolean=true):TStringDynArray;
-    function Lookup(const val:string):integer;
+    function Lookup(const val:string;const CaseSensitive:boolean=true):integer;
     // heap operations are costy use them carfully
     function Push(v:string):string;
     function Pop():string;
@@ -281,10 +282,11 @@ type
     function ToQWords:TQWordDynArray;
     generic function ToType<T>(const Conv:{$ifdef fpc}specialize{$endif} TConvertCallback<string,T>):{$ifdef fpc}specialize{$endif} TArray<T>;
     class function cmp(const a, b: string): integer; static;inline;
+    class function cmpText(const a, b: string): integer; static;inline;
     class function Every(const dst:PString; const aCount:integer;const func:{$ifdef fpc}specialize{$endif} TFilterCallback<string,PString>):boolean; static;inline;overload;
     class function Some(const dst:PString; const aCount:integer;const func:{$ifdef fpc}specialize{$endif} TFilterCallback<string,PString>):boolean; static;inline;overload;
   private
-    class procedure QuickSort(var Arr: TStringDynArray; const L, R: Longint;const Compare: TCompareFuncStr); static;
+    class procedure QuickSort(var Arr: TStringDynArray; const L, R: Longint;const Descending:boolean; const Compare: TCompareFuncStr); static;
     class function uniqueFilt(const a:string;const i:integer;arr:PString):boolean;static;inline;
 
   end;
@@ -301,8 +303,8 @@ type
   public
     function reduce(func:{$ifdef fpc}specialize{$endif} TReduceCallback<TStringDynArray>;const init:TStringDynArray=nil):TStringDynArray;   overload;
     function reduce(func:{$ifdef fpc}specialize{$endif} TSimpleReduceCallback<TStringDynArray>):TStringDynArray;                         overload;
-    function Sort(CompareFunc:TCompareFuncStringAA= nil):TStringArrayArray;
-    function Sorted(CompareFunc:TCompareFuncStringAA= nil):TStringArrayArray;
+    function Sort(const Descending:boolean=false; CompareFunc:TCompareFuncStringAA= nil):TStringArrayArray;
+    function Sorted(const Descending:boolean=false; CompareFunc:TCompareFuncStringAA= nil):TStringArrayArray;
     function Lookup(const val:TStringDynArray):integer;
     function Map(func:{$ifdef fpc}specialize{$endif} TMapCallback<TStringDynArray>):TStringArrayArray;          overload;
     function Map(func:{$ifdef fpc}specialize{$endif} TSimpleMapCallback<TStringDynArray>):TStringArrayArray;    overload;
@@ -325,7 +327,7 @@ type
     class function FromDelimtedText(const Str:string;const LineBreak:string=LineEnding;const Delimiter:Char=',';const Quote:char='"'):TStringArrayArray;  static; overload;
     class function FromDelimtedText(const Str:string;const LineBreak:string;const Delimiter:Char;const StartingQuote,EndingQuote:Char):TStringArrayArray; static; overload;
   private
-    class procedure QuickSort(var Arr: TStringArrayArray; const L, R: Longint;const Compare: TCompareFuncStringAA); static;
+    class procedure QuickSort(var Arr: TStringArrayArray; const L, R: Longint;const Descending:boolean; const Compare: TCompareFuncStringAA); static;
     class function uniqueFilt(const a:TStringDynArray;const i:integer;arr:PStringArray):boolean;static;
   end;
 
@@ -344,8 +346,8 @@ type
   public
     function reduce(func:{$ifdef fpc}specialize{$endif} TReduceCallback<TType>;const init:TType):TType;   overload;
     function reduce(func:{$ifdef fpc}specialize{$endif} TSimpleReduceCallback<TType>):TType;                         overload;
-    function Sort(CompareFunc:TCompare= nil):TSelf;
-    function Sorted(CompareFunc:TCompare= nil):TSelf;
+    function Sort(const Descending:boolean=false; CompareFunc:TCompare= nil):TSelf;
+    function Sorted(const Descending:boolean=false; CompareFunc:TCompare= nil):TSelf;
     function Lookup(const val:TType):integer;
     function Map(func:{$ifdef fpc}specialize{$endif} TMapCallback<TType>):TSelf;          overload;
     function Map(func:{$ifdef fpc}specialize{$endif} TSimpleMapCallback<TType>):TSelf;    overload;
@@ -376,7 +378,7 @@ type
     function reverse():TSelf;
     function ToString(const Seperator: string=', '; const quote: string='"';const Brackets:boolean=true): string;
     class function cmp(const a, b: TType): integer;static;
-    class procedure QuickSort(var Arr: TSelf; const L, R: Longint;const Compare: TCompare); static;
+    class procedure QuickSort(var Arr: TSelf; const L, R: Longint;const Descending:boolean; const Compare: TCompare); static;
     class function uniqueFilt(const a:TType;const i:integer;arr:PType):boolean;static;
 
   end;
@@ -395,8 +397,8 @@ type
   public
     function reduce(func:{$ifdef fpc}specialize{$endif} TReduceCallback<TType>;const init:TType):TType;   overload;
     function reduce(func:{$ifdef fpc}specialize{$endif} TSimpleReduceCallback<TType>):TType;                         overload;
-    function Sort(CompareFunc:TCompare= nil):TSelf;
-    function Sorted(CompareFunc:TCompare= nil):TSelf;
+    function Sort(const Descending:boolean=false; CompareFunc:TCompare= nil):TSelf;
+    function Sorted(const Descending:boolean=false; CompareFunc:TCompare= nil):TSelf;
     function Lookup(const val:TType):integer;
     function Map(func:{$ifdef fpc}specialize{$endif} TMapCallback<TType>):TSelf;          overload;
     function Map(func:{$ifdef fpc}specialize{$endif} TSimpleMapCallback<TType>):TSelf;    overload;
@@ -415,14 +417,14 @@ type
     function concat(Items:TSelf):TSelf;
     function ToString(const Seperator: string=', '; const quote: string='"';const Brackets:boolean=true): string;
     class function cmp(const a, b: TType): integer;static;
-    class procedure QuickSort(var Arr: TSelf; const L, R: Longint;const Compare: TCompare); static;
+    class procedure QuickSort(var Arr: TSelf; const L, R: Longint;const Descending:boolean; const Compare: TCompare); static;
     class function uniqueFilt(const a:TType;const i:integer;arr:PType):boolean;static;
 
   end;
 
 
 { TKeyValueList<TK,TR> }
-{$ifdef fpc}generic{$endif} TKeyValueList<TK,TV>=record
+{$ifdef fpc}generic{$endif} TSortedKeyValueList<TK,TV>=record
   type
     PK= array of TK;
   var
@@ -432,7 +434,10 @@ type
     function GetValues(const key: TK): TV;
     procedure SetValues(const key: TK; const AValue: TV);
   public
-    function KeyExists(key: TK): boolean;
+    function KeyExists(const key: TK): boolean;
+    function IndexOfKey(const Key:TK):integer;
+    function IndexOfValue(const AValue:TV):integer;
+    function AddOrUpdate(const Key:TK;const AValue:TV):integer;
     property Values[key:TK]:TV read GetValues write SetValues ;default;
     function Count:integer;
     procedure Remove(const index:integer);
@@ -530,14 +535,14 @@ operator +(const v: TStringDynArray ;const Arr: TStringArrayArray  ): TStringArr
 function dotest(pa:integer):string;
 
 implementation
-{ TKeyValueList }
+{ TSortedKeyValueList }
 
-function TKeyValueList{$ifndef fpc}<TK,TV>{$endif}.Count: integer;
+function TSortedKeyValueList{$ifndef fpc}<TK,TV>{$endif}.Count: integer;
 begin
   result:=Length(Keys)
 end;
 
-procedure TKeyValueList{$ifndef fpc}<TK,TV>{$endif}.Remove(const index: integer);
+procedure TSortedKeyValueList{$ifndef fpc}<TK,TV>{$endif}.Remove(const index: integer);
 begin
   if (index>=0) and (index<Count) then begin
     Delete(Keys,index,1);
@@ -545,7 +550,7 @@ begin
   end;
 end;
 
-function TKeyValueList{$ifndef fpc}<TK,TV>{$endif}.GetValues(const key: TK): TV;
+function TSortedKeyValueList{$ifndef fpc}<TK,TV>{$endif}.GetValues(const key: TK): TV;
 var i:integer;
 begin
   i:={$ifdef fpc}specialize{$endif} _BinSearch<TK, PK>(Keys ,key,Length(Keys));
@@ -553,7 +558,7 @@ begin
     result:=ValueList[i]
 end;
 
-procedure TKeyValueList{$ifndef fpc}<TK,TV>{$endif}.SetValues(const key: TK; const AValue: TV);
+procedure TSortedKeyValueList{$ifndef fpc}<TK,TV>{$endif}.SetValues(const key: TK; const AValue: TV);
 var i:integer;
 begin
   i:={$ifdef fpc}specialize{$endif} _BinSearch<TK,PK>(Keys,key,Length(Keys));
@@ -569,10 +574,52 @@ begin
     //end;
 end;
 
-function TKeyValueList{$ifndef fpc}<TK,TV>{$endif}.KeyExists(key: TK): boolean;
+function TSortedKeyValueList{$ifndef fpc}<TK,TV>{$endif}.KeyExists(const key: TK): boolean;
 begin
   result:={$ifdef fpc}specialize{$endif} _BinSearch<TK,PK>(Keys,key,Length(Keys))>=0;
 end;
+
+function TSortedKeyValueList.IndexOfKey(const Key: TK): integer;
+begin
+  result:={$ifdef fpc}specialize{$endif} _BinSearch<TK,PK>(Keys,key,Length(Keys));
+end;
+
+function TSortedKeyValueList.IndexOfValue(const AValue: TV): integer;
+var i:integer;
+begin
+  result:=-1;
+  //if GetTypeKind(AValue)=tkDynArray then
+  //  for i:=0 to High(ValueList) do begin
+  //    if CompareByte(ValueList[i],AValue,GetTypeData(TypeInfo(AValue))^.elSize*(High(AValue)+1))=0 then begin
+  //      result:=i ;
+  //      exit
+  //    end
+  //  end
+  //else
+  for i:=0 to High(ValueList) do
+    if CompareByte(ValueList[i],AValue,SizeOf(AValue))=0 then begin
+      result:=i ;
+      exit
+    end;
+end;
+
+function TSortedKeyValueList.AddOrUpdate(const Key: TK; const AValue: TV): integer;
+var i:integer;
+begin
+  i:={$ifdef fpc}specialize{$endif} _BinSearch<TK,PK>(Keys,key,Length(Keys));
+  if i<0 then
+    begin
+      i:=-(i+1);
+      Insert(key, Keys,i);
+      Insert(AValue,ValueList,i)
+    end
+  else
+    //begin
+      ValueList[i]:=AValue ;
+  result:=i
+    //end;
+end;
+
 
 { TVariantArrayHelper }
 
@@ -596,12 +643,12 @@ function TVariantArrayHelper.reduce(func:{$ifdef fpc}specialize{$endif} TSimpleR
 //
 //end;
 //
-function TVariantArrayHelper.Sort(CompareFunc:TCompare):TSelf;   _DOSORT_;
+function TVariantArrayHelper.Sort(const Descending:boolean; CompareFunc:TCompare):TSelf;   _DOSORT_;
 //begin
 //
 //end;
 
-function TVariantArrayHelper.Sorted(CompareFunc:TCompare):TSelf; _SORTED_;
+function TVariantArrayHelper.Sorted(const Descending:boolean; CompareFunc:TCompare):TSelf; _SORTED_;
 //begin
 //
 //end;
@@ -756,9 +803,9 @@ begin
   else if a=b then result:=0
 end;
 
-class procedure TVariantArrayHelper.QuickSort(var Arr: TSelf; const L, R: Longint;const Compare: TCompare); static;
+class procedure TVariantArrayHelper.QuickSort(var Arr: TSelf; const L, R: Longint; const Descending:boolean; const Compare: TCompare); static;
 begin
-  {$ifdef fpc}specialize{$endif} _QuickSort<TType,PType>(@Arr[0],L,R,Compare)  ;
+  {$ifdef fpc}specialize{$endif} _QuickSort<TType,PType>(@Arr[0],L,R,Descending,Compare)  ;
 end;
 
 class function TVariantArrayHelper.uniqueFilt(const a:TType;const i:integer;arr:PType):boolean;static;
@@ -784,9 +831,9 @@ function TVariantArray2DHelper.reduce(func:{$ifdef fpc}specialize{$endif} TReduc
 
 function TVariantArray2DHelper.reduce(func:{$ifdef fpc}specialize{$endif} TSimpleReduceCallback<TType>):TType;  _SIMPLEREDUCE_;
 
-function TVariantArray2DHelper.Sort(CompareFunc:TCompare= nil):TSelf;  _DOSORT_;
+function TVariantArray2DHelper.Sort(const Descending:boolean; CompareFunc:TCompare= nil):TSelf;  _DOSORT_;
 
-function TVariantArray2DHelper.Sorted(CompareFunc:TCompare= nil):TSelf;  _SORTED_;
+function TVariantArray2DHelper.Sorted(const Descending:boolean; CompareFunc:TCompare= nil):TSelf;  _SORTED_;
 
 function TVariantArray2DHelper.Lookup(const val:TType):integer;
 begin
@@ -845,9 +892,9 @@ begin
   else result:=0;
 end;
 
-class procedure TVariantArray2DHelper.QuickSort(var Arr: TSelf; const L, R: Longint;const Compare: TCompare); static;
+class procedure TVariantArray2DHelper.QuickSort(var Arr: TSelf; const L, R: Longint;const Descending:boolean; const Compare: TCompare); static;
 begin
-  {$ifdef fpc}specialize{$endif} _QuickSort<TType,PType>(@Arr[0],L,R,Compare)  ;
+  {$ifdef fpc}specialize{$endif} _QuickSort<TType,PType>(@Arr[0],L,R,Descending,Compare)  ;
 end;
 
 class function TVariantArray2DHelper.uniqueFilt(const a:TType;const i:integer;arr:PType):boolean;static;
@@ -1058,7 +1105,7 @@ end;
 {$ifdef fpc}generic{$endif} function Mode<T>(const Self:array of T):T;
 var
   i,r,c:integer;
-  LS:{$ifdef fpc}specialize {$endif}TKeyValueList<T,integer>;
+  LS:{$ifdef fpc}specialize {$endif}TSortedKeyValueList<T,integer>;
 begin
   r:=0;
   for i:=0 to High(Self) do begin
@@ -1274,8 +1321,8 @@ function TStringArrayArrayHelper.reduce(func: {$ifdef fpc}specialize{$endif} TRe
 
 function TStringArrayArrayHelper.reduce(func: {$ifdef fpc}specialize{$endif} TSimpleReduceCallback<TStringDynArray>): TStringDynArray;_SIMPLEREDUCE_;
 
-function TStringArrayArrayHelper.Sort(CompareFunc: TCompareFuncStringAA):TStringArrayArray;  _DOSORT_;
-function TStringArrayArrayHelper.Sorted(CompareFunc: TCompareFuncStringAA): TStringArrayArray;_SORTED_;
+function TStringArrayArrayHelper.Sort(const Descending:boolean; CompareFunc: TCompareFuncStringAA):TStringArrayArray;  _DOSORT_;
+function TStringArrayArrayHelper.Sorted(const Descending:boolean; CompareFunc: TCompareFuncStringAA): TStringArrayArray;_SORTED_;
 
 function TStringArrayArrayHelper.Lookup(const val:TStringDynArray):integer;
 begin
@@ -1350,10 +1397,9 @@ begin
     Result[i]:=sLines[i].Split([Delimiter],StartingQuote,EndingQuote);
 end;
 
-class procedure TStringArrayArrayHelper.QuickSort(var Arr: TStringArrayArray;
-  const L, R: Longint; const Compare: TCompareFuncStringAA);
+class procedure TStringArrayArrayHelper.QuickSort(var Arr: TStringArrayArray; const L, R: Longint;const Descending:boolean;  const Compare: TCompareFuncStringAA);
 begin
-    {$ifdef fpc}specialize{$endif} _QuickSort<TStringDynArray,PStringArray>(@Arr[0],L,R,Compare)  ;
+    {$ifdef fpc}specialize{$endif} _QuickSort<TStringDynArray,PStringArray>(@Arr[0],L,R,Descending,Compare)  ;
 end;
 
 class function TStringArrayArrayHelper.uniqueFilt(const a:TStringDynArray;const i:integer;arr:PStringArray):boolean;
@@ -1376,15 +1422,23 @@ function TStringArrayHelper.reduce(func: {$ifdef fpc}specialize{$endif} TReduceC
 
 function TStringArrayHelper.GetCount: Integer;   _DOCOUNT_;
 
-function TStringArrayHelper.Sort(const CompareFunc: TCompareFuncStr):TStringDynArray; _DOSORT_ ;
+function TStringArrayHelper.Sort(const Descending:boolean; const CompareFunc: TCompareFuncStr):TStringDynArray; _DOSORT_ ;
 
-function TStringArrayHelper.Lookup(const val:string):integer;
+function TStringArrayHelper.Lookup(const val:string;const CaseSensitive:boolean):integer;
 begin
   // assuming that the array is sorted
-  result:={$ifdef fpc}specialize{$endif} _BinSearch<string,PString>(@Self[0],Val,Length(Self),TCompareFuncStr({$ifdef fpc}@{$endif}Self.cmp));
+  if CaseSensitive then
+    result:={$ifdef fpc}specialize{$endif} _BinSearch<string,PString>(@Self[0],Val,Length(Self),TCompareFuncStr({$ifdef fpc}@{$endif}Self.cmp))
+  else
+    result:={$ifdef fpc}specialize{$endif} _BinSearch<string,PString>(@Self[0],Val,Length(Self),TCompareFuncStr({$ifdef fpc}@{$endif}Self.cmpText));
 end;
 
-function TStringArrayHelper.Sorted(const CompareFunc: TCompareFuncStr): TStringDynArray;_SORTED_;
+function TStringArrayHelper.Sorted(const Descending:boolean; const CompareFunc: TCompareFuncStr): TStringDynArray;_SORTED_;
+
+function TStringArrayHelper.SortText(): TStringDynArray;
+begin
+  result:=Sort(false,{$ifdef fpc}@{$endif}cmpText)
+end;
 
 function TStringArrayHelper.isSorted(const descending:boolean;  CompareFunc: TCompareFuncStr): boolean;_ISSORTED_;
 
@@ -1550,10 +1604,14 @@ begin
   result:=CompareStr(a,b)
 end;
 
-class procedure TStringArrayHelper.QuickSort(var Arr: TStringDynArray; const L,
-  R: Longint; const Compare: TCompareFuncStr);
+class function TStringArrayHelper.cmpText(const a, b: string): integer;
 begin
-  {$ifdef fpc}specialize{$endif} _QuickSort<string,PString>(@Arr[0],L,R,Compare)
+  result:=CompareText(a,b)
+end;
+
+class procedure TStringArrayHelper.QuickSort(var Arr: TStringDynArray; const L, R: Longint;const Descending:boolean;  const Compare: TCompareFuncStr);
+begin
+  {$ifdef fpc}specialize{$endif} _QuickSort<string,PString>(@Arr[0],L,R,Descending,Compare)
 end;
 
 function TStringArrayHelper.as2d(const Columns:integer;const Transposed:boolean):TStringArrayArray;

@@ -87,10 +87,10 @@ function TComplexArrayHelper.Map(func:{$ifdef fpc}specialize{$endif} TSimpleMapC
 function TComplexArrayHelper.Map(func: {$ifdef fpc}specialize{$endif} TMapCallbackVar<Complex>
   ): TVariantArray; _DOMAP_;
 
-function TComplexArrayHelper.Sort(CompareFunc: TCompareFuncComplex): TComplexArray; _DOSORT_;
+function TComplexArrayHelper.Sort(const Descending:boolean; CompareFunc: TCompareFuncComplex): TComplexArray; _DOSORT_;
 { Sort by magnitute length}
 
-function TComplexArrayHelper.Sorted(CompareFunc: TCompareFuncComplex
+function TComplexArrayHelper.Sorted(const Descending:boolean; CompareFunc: TCompareFuncComplex
   ): TComplexArray; _SORTED_;
 
 function TComplexArrayHelper.Slice(start, _end: integer): TComplexArray; _SLICE_;
@@ -945,9 +945,9 @@ begin
   //else if m1<m2 then result:=-1 else result:=0;
 end;
 
-class procedure TComplexArrayHelper.QuickSort(var Arr: TComplexArray; const L, R: Longint;const Compare: TCompareFuncComplex);
+class procedure TComplexArrayHelper.QuickSort(var Arr: TComplexArray; const L, R: Longint; const Descending:boolean; const Compare: TCompareFuncComplex);
 begin
-    {$ifdef fpc}specialize{$endif} _QuickSort<Complex,PComplex>(@Arr[0],L,R,Compare)
+    {$ifdef fpc}specialize{$endif} _QuickSort<Complex,PComplex>(@Arr[0],L,R,Descending,Compare)
 end;
 
 class procedure TComplexArrayHelper.Conj(const result:PComplex;const N:integer ;const Self:PComplex);

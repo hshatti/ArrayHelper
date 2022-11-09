@@ -10,9 +10,9 @@
 
 {$define _SIMPLEREDUCE_:=var i,l:integer; begin l:=Length(Self); if l>0 then result:=self[0]; for i:=1 to l-1 do result:=func(result,self[i]) end}
 
-{$define _DOSORT_:=begin if Assigned(CompareFunc) then QuickSort(Self, 0, High(Self),CompareFunc) else QuickSort(Self, 0, High(Self),@cmp);result:=self end}
+{$define _DOSORT_:=begin if Assigned(CompareFunc) then QuickSort(Self, 0, High(Self), Descending ,CompareFunc) else QuickSort(Self, 0, High(Self), Descending,@cmp);result:=self end}
 
-{$define _SORTED_:=begin result:=copy(self);result.sort(CompareFunc) end}
+{$define _SORTED_:=begin result:=copy(self);result.sort(Descending,CompareFunc) end}
 
 {$define _ISSORTED_:=var i:integer; begin  result:=true; if not Assigned(CompareFunc) then CompareFunc:={$ifdef fpc}@{$endif}Self.cmp; if descending then for i:=1 to high(Self) do if CompareFunc(Self[i-1],Self[i])<0 then begin result:=false; exit() end else else for i:=1 to high(Self) do if CompareFunc(Self[i],Self[i-1])<0 then begin result:=false; exit() end end}
 

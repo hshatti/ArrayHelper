@@ -8,10 +8,9 @@
 
 { TFloatArrayHelper }
 
-class procedure TFloatArrayHelper.QuickSort(var Arr: TFloatDynArray; const L,
-  R: Longint; const Compare: {$ifdef fpc}specialize{$endif} TComparefunc<Float>);
+class procedure TFloatArrayHelper.QuickSort(var Arr: TFloatDynArray; const L, R: Longint; const Descending:boolean; const Compare: {$ifdef fpc}specialize{$endif} TComparefunc<Float>);
 begin
-    {$ifdef fpc}specialize{$endif} _QuickSort<Float,PFloat>(@Arr[0],L,R,Compare)
+    {$ifdef fpc}specialize{$endif} _QuickSort<Float,PFloat>(@Arr[0],L,R,Descending, Compare)
 end;
 
 class function TFloatArrayHelper.cmp(const a,b:Float):Integer  ;
@@ -57,9 +56,9 @@ function TFloatArrayHelper.reduce(func: {$ifdef fpc}specialize{$endif} TSimpleRe
 
 function TFloatArrayHelper.GetCount: integer;_DOCOUNT_;
 
-function TFloatArrayHelper.Sort(const CompareFunc: {$ifdef fpc}specialize{$endif} TComparefunc<Float>):TFloatDynArray; _DOSORT_ ;
+function TFloatArrayHelper.Sort(const Descending:boolean; const CompareFunc: {$ifdef fpc}specialize{$endif} TComparefunc<Float>):TFloatDynArray; _DOSORT_ ;
 
-function TFloatArrayHelper.Sorted(const CompareFunc: {$ifdef fpc}specialize{$endif} TComparefunc<Float>): TFloatDynArray; _SORTED_;
+function TFloatArrayHelper.Sorted(const Descending:boolean; const CompareFunc: {$ifdef fpc}specialize{$endif} TComparefunc<Float>): TFloatDynArray; _SORTED_;
 
 function TFloatArrayHelper.isSorted(const descending:boolean =false; CompareFunc: {$ifdef fpc}specialize{$endif} TCompareFunc<Float> = nil):boolean; _ISSORTED_;
 //var i:integer;
@@ -1701,9 +1700,9 @@ function TFloatArrayArrayHelper.reduce(func: {$ifdef fpc}specialize{$endif} TRed
 
 function TFloatArrayArrayHelper.reduce(func: {$ifdef fpc}specialize{$endif} TSimpleReduceCallback<TFloatDynArray>): TFloatDynArray;_SIMPLEREDUCE_;
 
-function TFloatArrayArrayHelper.Sort(CompareFunc: {$ifdef fpc}specialize{$endif} TCompareFunc<TFloatDynArray>):TFloatArrayArray;_DOSORT_;
+function TFloatArrayArrayHelper.Sort(const Descending:boolean; CompareFunc: {$ifdef fpc}specialize{$endif} TCompareFunc<TFloatDynArray>):TFloatArrayArray;_DOSORT_;
 
-function TFloatArrayArrayHelper.Sorted(CompareFunc: {$ifdef fpc}specialize{$endif} TCompareFunc<TFloatDynArray>): TFloatArrayArray;_SORTED_;
+function TFloatArrayArrayHelper.Sorted(const Descending:boolean; CompareFunc: {$ifdef fpc}specialize{$endif} TCompareFunc<TFloatDynArray>): TFloatArrayArray;_SORTED_;
 
 function TFloatArrayArrayHelper.Lookup(const val:TFloatDynArray):integer;
 begin
@@ -1774,9 +1773,9 @@ class function TFloatArrayArrayHelper.Every(const dst:PFloatDynArray; const aCou
 class function TFloatArrayArrayHelper.Some(const dst:PFloatDynArray; const aCount:integer;const func:{$ifdef fpc}specialize{$endif} TFilterCallback<TFloatDynArray,PFloatDynArray>):boolean;  _SOME_;
 
 
-class procedure TFloatArrayArrayHelper.QuickSort(var Arr: TFloatArrayArray;const L, R: Longint; const Compare: {$ifdef fpc}specialize{$endif} TCompareFunc<TFloatDynArray>);
+class procedure TFloatArrayArrayHelper.QuickSort(var Arr: TFloatArrayArray;const L, R: Longint;const Descending:boolean;  const Compare: {$ifdef fpc}specialize{$endif} TCompareFunc<TFloatDynArray>);
 begin
- {$ifdef fpc}specialize{$endif} _QuickSort<TFloatDynArray,PFloatDynArray>(@Arr[0],L,R,Compare)
+ {$ifdef fpc}specialize{$endif} _QuickSort<TFloatDynArray,PFloatDynArray>(@Arr[0],L,R,Descending,Compare)
 end;
 {$ifdef fpc}
 operator:=(const Arr:TFloatDynArray):string;

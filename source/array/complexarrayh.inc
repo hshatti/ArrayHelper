@@ -20,8 +20,8 @@
    function Map(func:{$ifdef fpc}specialize{$endif} TSimpleMapCallback<Complex>):TComplexArray;    _inline        overload;
    function Map(func:{$ifdef fpc}specialize{$endif} TSimpleMapCallbackComplex<Complex>):TFloatDynArray; _inline  overload;
    function Map(func:{$ifdef fpc}specialize{$endif} TMapCallbackVar<Complex>):TVariantArray;       _inline        overload;
-   function Sort(CompareFunc: TCompareFuncComplex= nil):TComplexArray;            _inline
-   function Sorted(CompareFunc: TCompareFuncComplex= nil):TComplexArray;          _inline
+   function Sort(const Descending:boolean=false; CompareFunc: TCompareFuncComplex= nil):TComplexArray;            _inline
+   function Sorted(const Descending:boolean=false; CompareFunc: TCompareFuncComplex= nil):TComplexArray;          _inline
    function Lookup(const val:Complex):integer;
    function Slice(start,_end:integer):TComplexArray;  _inline
    function Splice(start,deleteCount:integer;Items:TComplexArray):TComplexArray; _inline
@@ -100,6 +100,6 @@
    class procedure Conj(const result:PComplex;const N:integer ;const Self:PComplex);                              static;_inline overload;
    class procedure Gather(const dst,Self:PFloat;const Stride, N:integer);                                         static;_inline overload;
    private
-     class procedure QuickSort(var Arr: TComplexArray; const L, R: Longint;const Compare: TCompareFuncComplex); static;
+     class procedure QuickSort(var Arr: TComplexArray; const L, R: Longint; const Descending:boolean;const Compare: TCompareFuncComplex); static;
  end;
 

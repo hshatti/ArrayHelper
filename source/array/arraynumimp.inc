@@ -16,9 +16,9 @@ function TNumberArrayHelper.reduce(func: {$ifdef fpc}specialize{$endif} TSimpleR
 
 function TNumberArrayHelper.GetCount: Integer; _DOCOUNT_ ;
 
-function TNumberArrayHelper.Sort(const CompareFunc:  {$ifdef fpc}specialize{$endif} TCompareFunc<Number>):TNumberDynArray;_DOSORT_;
+function TNumberArrayHelper.Sort(const Descending:boolean; const CompareFunc:  {$ifdef fpc}specialize{$endif} TCompareFunc<Number>):TNumberDynArray;_DOSORT_;
 
-function TNumberArrayHelper.Sorted(const CompareFunc:  {$ifdef fpc}specialize{$endif} TCompareFunc<Number>): TNumberDynArray; _SORTED_;
+function TNumberArrayHelper.Sorted(const Descending:boolean; const CompareFunc:  {$ifdef fpc}specialize{$endif} TCompareFunc<Number>): TNumberDynArray; _SORTED_;
 
 function TNumberArrayHelper.isSorted(const descending:boolean=false; CompareFunc:  {$ifdef fpc}specialize{$endif} TCompareFunc<Number> =nil): boolean; _ISSORTED_;
 
@@ -595,9 +595,9 @@ begin
     dst[i]:=Self[i*Stride]
 end;
 
-class procedure TNumberArrayHelper.QuickSort(var Arr: TNumberDynArray; const L, R: Longint; const Compare: {$ifdef fpc}specialize{$endif} TCompareFunc<Number>);
+class procedure TNumberArrayHelper.QuickSort(var Arr: TNumberDynArray; const L, R: Longint;const Descending:boolean;  const Compare: {$ifdef fpc}specialize{$endif} TCompareFunc<Number>);
 begin
-   {$ifdef fpc}specialize{$endif} _QuickSort<Number,PNumber>(@Arr[0],L,R,Compare)
+   {$ifdef fpc}specialize{$endif} _QuickSort<Number,PNumber>(@Arr[0],L,R,Descending,Compare)
 end;
 function TNumberArrayHelper.Add(const Vals:TNumberDynArray):TNumberDynArray;
 var i,C:integer;
@@ -761,10 +761,10 @@ function TNumberArrayArrayHelper.reduce(func: {$ifdef fpc}specialize{$endif} TRe
 function TNumberArrayArrayHelper.reduce(func: {$ifdef fpc}specialize{$endif} TSimpleReduceCallback<TNumberDynArray>): TNumberDynArray;_SIMPLEREDUCE_;
 
 //self sort
-function TNumberArrayArrayHelper.Sort(CompareFunc: {$ifdef fpc}specialize{$endif} TCompareFunc<TNumberDynArray>):TNumberArrayArray;_DOSORT_;
+function TNumberArrayArrayHelper.Sort(const Descending:boolean; CompareFunc: {$ifdef fpc}specialize{$endif} TCompareFunc<TNumberDynArray>):TNumberArrayArray;_DOSORT_;
 
 //new sorted array (Self is not affected)
-function TNumberArrayArrayHelper.Sorted(CompareFunc: {$ifdef fpc}specialize{$endif} TCompareFunc<TNumberDynArray>): TNumberArrayArray;_SORTED_;
+function TNumberArrayArrayHelper.Sorted(const Descending:boolean; CompareFunc: {$ifdef fpc}specialize{$endif} TCompareFunc<TNumberDynArray>): TNumberArrayArray;_SORTED_;
 
 function TNumberArrayArrayHelper.Map(func: {$ifdef fpc}specialize{$endif} TMapCallback<TNumberDynArray>): TNumberArrayArray;_DOMAP_;
 
@@ -825,9 +825,9 @@ begin
   else result:=0;
 end;
 
-class procedure TNumberArrayArrayHelper.QuickSort(var Arr: TNumberArrayArray;const L, R: Longint; const Compare: {$ifdef fpc}specialize{$endif} TCompareFunc<TNumberDynArray>);
+class procedure TNumberArrayArrayHelper.QuickSort(var Arr: TNumberArrayArray;const L, R: Longint;const Descending:boolean;  const Compare: {$ifdef fpc}specialize{$endif} TCompareFunc<TNumberDynArray>);
 begin
-  {$ifdef fpc}specialize{$endif} _QuickSort<TNumberDynArray,PNumberArray>(@Arr[0],L,R,Compare)
+  {$ifdef fpc}specialize{$endif} _QuickSort<TNumberDynArray,PNumberArray>(@Arr[0],L,R,Descending,Compare)
 end;
 
 {$ifdef fpc}

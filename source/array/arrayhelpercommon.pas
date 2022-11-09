@@ -53,9 +53,9 @@ type
   TMapCallbackSingle={$ifdef fpc}specialize{$endif} TMapCallback<Single>;
   TMapCallbackDouble={$ifdef fpc}specialize{$endif} TMapCallback<Double>;
   {$ifdef fpc}generic{$endif} function _Compare<T>(const a,b:T):integer;
-  {$ifdef fpc}generic{$endif} function _BinSearch<T,PT>(const Arr:PT;const Val:T;R:integer; const Compare:{$ifdef fpc}specialize{$endif} TComparefunc<T>):integer;          overload;
+  {$ifdef fpc}generic{$endif} function _BinSearch<T,PT>(const Arr:PT;const Val:T; R:integer; const Compare:{$ifdef fpc}specialize{$endif} TComparefunc<T>):integer;          overload;
   {$ifdef fpc}generic{$endif} function _BinSearch<T,PT>(const Arr:PT;const Val:T; R:integer; Compare:{$ifdef fpc}specialize{$endif} TComparefuncNested<T> =nil):integer;     overload;
-  {$ifdef fpc}generic{$endif} procedure _QuickSort<T,PT>(const Arr: PT; L, R : Longint; const Compare: {$ifdef fpc}specialize{$endif} TComparefunc<T>); inline ;
+  {$ifdef fpc}generic{$endif} procedure _QuickSort<T,PT>(const Arr: PT; L, R : Longint;const Descending:boolean; const Compare: {$ifdef fpc}specialize{$endif} TComparefunc<T>); inline ;
   {$ifdef fpc}generic{$endif} procedure _Reverse<T,PT>(const Arr: PT; const aCount: Longint); inline ;
 
 const
@@ -322,19 +322,20 @@ begin
 end;
 
 
-{$ifdef fpc}generic{$endif} procedure _QuickSort<T,PT>(const Arr: PT; L, R : Longint; const Compare: {$ifdef fpc}specialize{$endif} TComparefunc<T>); inline ;
-var I,J :integer;
+{$ifdef fpc}generic{$endif} procedure _QuickSort<T,PT>(const Arr: PT; L, R : Longint; const Descending:boolean;const Compare: {$ifdef fpc}specialize{$endif} TComparefunc<T>); inline ;
+var I,J ,neg :integer;
     P, Q :T;
 begin
  //if not Assigned(Compare) then Compare:=@{$ifdef fpc}specialize{$endif}_Compare<T>;
+ neg:={$ifdef fpc}specialize{$endif} ifthen<integer>(descending,-1,1);
  repeat
    I := L;
    J := R;
    P := Arr[ (L + R) div 2 ];
    repeat
-     while Compare(P, Arr[i]) > 0 do
+     while neg*Compare(P, Arr[i]) > 0 do
        I := I + 1;
-     while Compare(P, Arr[J]) < 0 do
+     while neg*Compare(P, Arr[J]) < 0 do
        J := J - 1;
      If I <= J then
      begin
@@ -348,13 +349,13 @@ begin
    if J - L < R - I then
    begin
      if L < J then
-       {$ifdef fpc}specialize{$endif} _QuickSort<T,PT>(Arr, L, J, Compare);
+       {$ifdef fpc}specialize{$endif} _QuickSort<T,PT>(Arr, L, J, Descending, Compare);
      L := I;
    end
    else
    begin
      if I < R then
-       {$ifdef fpc}specialize{$endif} _QuickSort<T,PT>(Arr, I, R, Compare);
+       {$ifdef fpc}specialize{$endif} _QuickSort<T,PT>(Arr, I, R, Descending, Compare);
      R := J;
    end;
  until L >= R;

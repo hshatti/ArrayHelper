@@ -15,8 +15,8 @@ type
   function reduce(func:{$ifdef fpc}specialize{$endif} TReduceCallback<Float>;const init:Float=0):Float;  _inline     overload;
   function reduce(func:{$ifdef fpc}specialize{$endif} TSimpleReduceCallback<Float>):Float;  _inline                  overload;
   function GetCount:integer;_inline
-  function Sort(const CompareFunc:{$ifdef fpc}specialize{$endif} TCompareFunc<Float> = nil):TFloatDynArray;  _inline
-  function Sorted(const CompareFunc:{$ifdef fpc}specialize{$endif} TCompareFunc<Float> = nil):TFloatDynArray;  _inline
+  function Sort(const Descending:boolean=false; const CompareFunc:{$ifdef fpc}specialize{$endif} TCompareFunc<Float> = nil):TFloatDynArray;  _inline
+  function Sorted(const Descending:boolean=false; const CompareFunc:{$ifdef fpc}specialize{$endif} TCompareFunc<Float> = nil):TFloatDynArray;  _inline
   function isSorted(const descending:boolean =false; CompareFunc: {$ifdef fpc}specialize{$endif} TCompareFunc<Float> = nil):boolean;
   function Lookup(const val:Float):integer;
   function Map(func: {$ifdef fpc}specialize{$endif} TMapCallback<Float>): TFloatDynArray;   _inline          overload;
@@ -125,7 +125,7 @@ type
   function Transpose(const Width:integer; Height:integer=0):TFloatDynArray; _inline overload;
   class function cmp(const a, b: Float): Integer; static; _inline
 private
-  class procedure QuickSort(var Arr: TFloatDynArray; const L, R: Longint; const Compare: {$ifdef fpc}specialize{$endif} TCompareFunc<Float>); static;  _inline
+  class procedure QuickSort(var Arr: TFloatDynArray; const L, R: Longint;const Descending:boolean;  const Compare: {$ifdef fpc}specialize{$endif} TCompareFunc<Float>); static;  _inline
   class function uniqueFilt(const a:float;const i:integer;arr:PFloat):boolean; static;_inline
 public
   class procedure gemm_nn(const M, N, K:integer; const ALPHA:Float; const A:PFloat; const lda:integer; const B:PFloat; const ldb:integer; const C:PFloat; const ldc:integer);                            static;
@@ -176,8 +176,8 @@ private
 public
    function reduce(func:{$ifdef fpc}specialize{$endif} TReduceCallback<TFloatDynArray>;const init:TFloatDynArray=nil):TFloatDynArray; _inline  overload;
    function reduce(func:{$ifdef fpc}specialize{$endif} TSimpleReduceCallback<TFloatDynArray>):TFloatDynArray; _inline                          overload;
-   function Sort(CompareFunc:{$ifdef fpc}specialize{$endif} TCompareFunc<TFloatDynArray> = nil):TFloatArrayArray;    _inline
-   function Sorted(CompareFunc:{$ifdef fpc}specialize{$endif} TCompareFunc<TFloatDynArray> = nil):TFloatArrayArray; _inline
+   function Sort(const Descending:boolean=false; CompareFunc:{$ifdef fpc}specialize{$endif} TCompareFunc<TFloatDynArray> = nil):TFloatArrayArray;    _inline
+   function Sorted(const Descending:boolean=false; CompareFunc:{$ifdef fpc}specialize{$endif} TCompareFunc<TFloatDynArray> = nil):TFloatArrayArray; _inline
    function Lookup(const val:TFloatDynArray):integer;
    function Map(func:{$ifdef fpc}specialize{$endif} TMapCallback<TFloatDynArray>):TFloatArrayArray;   _inline                                  overload;
    function Map(func:{$ifdef fpc}specialize{$endif} TSimpleMapCallback<TFloatDynArray>):TFloatArrayArray;    _inline                           overload;
@@ -201,7 +201,7 @@ public
    class function Some(const dst:PFloatDynArray; const aCount:integer;const func:{$ifdef fpc}specialize{$endif} TFilterCallback<TFloatDynArray,PFloatDynArray>):boolean;  static;_inline overload;
 
 private
-   class procedure QuickSort(var Arr: TFloatArrayArray; const L, R: Longint;const Compare: {$ifdef fpc}specialize{$endif} TCompareFunc<TFloatDynArray>); static;   _inline
+   class procedure QuickSort(var Arr: TFloatArrayArray; const L, R: Longint;const Descending:boolean; const Compare: {$ifdef fpc}specialize{$endif} TCompareFunc<TFloatDynArray>); static;   _inline
    class function uniqueFilt(const a:TFloatDynArray;const i:integer;arr:PFloatDynArray):boolean;static; _inline
 end;
 

@@ -25,7 +25,7 @@ type
   TTimeSpec=timespec;
 
   const
-
+  {$if defined(linux)}
    //posix timer
   CLOCK_REALTIME                  = 0;
   CLOCK_MONOTONIC                 = 1;
@@ -34,8 +34,25 @@ type
   CLOCK_MONOTONIC_RAW             = 4;
   CLOCK_REALTIME_COARSE           = 5;
   CLOCK_MONOTONIC_COARSE          = 6;
-  THE_CLOCK=CLOCK_MONOTONIC_RAW;
 
+  {$elseif defined(darwin)}
+  CLOCK_REALTIME                  = 0;
+  CLOCK_MONOTONIC_RAW             = 4;
+  CLOCK_MONOTONIC_RAW_APPROX      = 5;
+  CLOCK_MONOTONIC                 = 6;
+  CLOCK_UPTIME_RAW                = 8;
+  CLOCK_UPTIME_RAW_APPROX         = 9;
+  CLOCK_PROCESS_CPUTIME_ID        = 12;
+  CLOCK_THREAD_CPUTIME_ID         = 16;
+
+  {$else}  // libc
+   CLOCK_REALTIME           = 0;
+   CLOCK_PROCESS_CPUTIME_ID = 2;
+   CLOCK_THREAD_CPUTIME_ID  = 3;
+   CLOCK_MONOTONIC_RAW      = 4,
+
+  {$endif}
+  THE_CLOCK=CLOCK_MONOTONIC_RAW;
   strTimeError = 'cannot read OS time!, ErrorNo [%s]';
 
   function clock_gettime(clk_id : clockid_t; tp: ptimespec) : longint  ;cdecl; external;
@@ -90,8 +107,11 @@ type
   { TProfiler }
   TProfiler=class
     LogStr:string;
-    m_Start,m_LastLog,m_Elapsed:QWord;
-    procedure Log(const str:string);
+    m_Start,m_LastLog,m_Elapsed,m_LastSegment:QWord;
+    m_segments  : array[0..$f] of int64;
+    procedure Log(const str:string);          overload;
+    procedure Log(const SegmentId:integer);   overload;
+    procedure LogSegments(const SegStrings:TStringArray);
     procedure Start;
     function Stop: QWord;
   end;
@@ -235,13 +255,33 @@ begin
 
    LogStr:=LogStr+format('Since Start[%3nms], Since LastLog[%3nms]: %s',[((HighResTimer.MicroSeconds - m_Start)/1000), (HighResTimer.MicroSeconds - m_LastLog)/1000, str])+LineEnding;
    m_LastLog:=HighResTimer.MicroSeconds;
+   m_LastSegment:=m_LastLog;
+end;
+
+procedure TProfiler.Log(const SegmentId: integer);
+begin
+  m_segments[SegmentId]:=m_segments[SegmentId]+HighResTimer.MicroSeconds-m_LastSegment;
+  m_LastSegment:=HighResTimer.MicroSeconds;
+end;
+
+procedure TProfiler.LogSegments(const SegStrings: TStringArray);
+var i:integer;sm:Int64 =0 ;
+begin
+  for i:=0 to High(SegStrings) do begin
+    LogStr:=Logstr+format(' +Segment summary : '+SegStrings[i]+' [%3nms]',[m_segments[i]/1000])+LineEnding;
+    sm :=sm+m_segments[i]
+  end;
+  LogStr:=Logstr+format('-------------------------------------'+LineEnding+'Total Segments : [%3nms]',[sm/1000])+LineEnding;
+  m_LastSegment:=HighResTimer.MicroSeconds;
 end;
 
 procedure TProfiler.Start;
 begin
+  LogStr:='';
+  FillQWord(m_segments[0],length(m_segments),0);
   m_Start:=HighResTimer.MicroSeconds;
   m_LastLog:=m_Start;
-  LogStr:='';
+  m_LastSegment:=m_Start;
 end;
 
 function TProfiler.Stop:QWord;

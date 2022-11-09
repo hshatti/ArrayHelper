@@ -13,8 +13,8 @@ type
    function reduce(func:{$ifdef fpc}specialize{$endif} TReduceCallback<Number>;const init:Number=0):Number;_inline  overload;
    function reduce(func:{$ifdef fpc}specialize{$endif} TSimpleReduceCallback<Number>):Number; _inline               overload;
    function GetCount:Integer; _inline
-   function Sort(const CompareFunc:{$ifdef fpc}specialize{$endif} TCompareFunc<Number> = nil):TNumberDynArray; _inline
-   function Sorted(const CompareFunc:{$ifdef fpc}specialize{$endif} TCompareFunc<Number> = nil):TNumberDynArray;  _inline
+   function Sort(const Descending:boolean=false; const CompareFunc:{$ifdef fpc}specialize{$endif} TCompareFunc<Number> = nil):TNumberDynArray; _inline
+   function Sorted(const Descending:boolean=false; const CompareFunc:{$ifdef fpc}specialize{$endif} TCompareFunc<Number> = nil):TNumberDynArray;  _inline
    function isSorted(const descending:boolean=false;  CompareFunc:{$ifdef fpc}specialize{$endif} TCompareFunc<Number> = nil):boolean;
    function Lookup(const val:Number):integer;
    function Map(func:{$ifdef fpc}specialize{$endif} TMapCallback<Number>):TNumberDynArray;  _inline          overload;
@@ -118,7 +118,7 @@ type
    class procedure Gather(const dst,Self:PNumber;const Stride, N:integer);            static;_inline overload;
 
  private
-   class procedure QuickSort(var Arr: TNumberDynArray; const L, R: Longint;const Compare: {$ifdef fpc}specialize{$endif} TCompareFunc<Number>); static;  _inline
+   class procedure QuickSort(var Arr: TNumberDynArray; const L, R: Longint;const Descending:boolean; const Compare: {$ifdef fpc}specialize{$endif} TCompareFunc<Number>); static;  _inline
    class function uniqueFilt(const a:Number;const i:integer;arr:PNumber):boolean;static;
  end;
 
@@ -135,8 +135,8 @@ type
  public
    function reduce(func:{$ifdef fpc}specialize{$endif} TReduceCallback<TNumberDynArray>;const init:TNumberDynArray=nil):TNumberDynArray; _inline    overload;
    function reduce(func:{$ifdef fpc}specialize{$endif} TSimpleReduceCallback<TNumberDynArray>):TNumberDynArray;   _inline                           overload;
-   function Sort(CompareFunc:{$ifdef fpc}specialize{$endif} TCompareFunc<TNumberDynArray> = nil):TNumberArrayArray;     _inline
-   function Sorted(CompareFunc:{$ifdef fpc}specialize{$endif} TCompareFunc<TNumberDynArray> = nil):TNumberArrayArray;   _inline
+   function Sort(const Descending:boolean=false; CompareFunc:{$ifdef fpc}specialize{$endif} TCompareFunc<TNumberDynArray> = nil):TNumberArrayArray;     _inline
+   function Sorted(const Descending:boolean=false; CompareFunc:{$ifdef fpc}specialize{$endif} TCompareFunc<TNumberDynArray> = nil):TNumberArrayArray;   _inline
    function Map(func:{$ifdef fpc}specialize{$endif} TMapCallback<TNumberDynArray>):TNumberArrayArray;     _inline                        overload;
    function Map(func:{$ifdef fpc}specialize{$endif} TSimpleMapCallback<TNumberDynArray>):TNumberArrayArray;    _inline                   overload;
    function Map(func:{$ifdef fpc}specialize{$endif} TSimpleMapCallbackNested<TNumberDynArray>):TNumberArrayArray;    _inline                   overload;
@@ -156,7 +156,7 @@ type
    function ToString(const Seperator: string=', '): string;     _inline
    class function cmp(const a, b: TNumberDynArray): integer;static;
  private
-   class procedure QuickSort(var Arr: TNumberArrayArray; const L, R: Longint;const Compare: {$ifdef fpc}specialize{$endif} TCompareFunc<TNumberDynArray>); static;  _inline
+   class procedure QuickSort(var Arr: TNumberArrayArray; const L, R: Longint;const Descending:boolean; const Compare: {$ifdef fpc}specialize{$endif} TCompareFunc<TNumberDynArray>); static;  _inline
    class function uniqueFilt(const a:TNumberDynArray;const i:integer;arr:PNumberArray):boolean;static;
  end;
 
