@@ -1,13 +1,15 @@
 unit ArrayHelper;
-{.$undef fpc}
-{$ifndef fpc}{$mode delphi}{$endif}
-{$H+}
-{$M-}
-{$ModeSwitch typehelpers}
-{$ModeSwitch advancedrecords}
-{$inline on}
-{$SafeFPUExceptions OFF}
-{$FPUTYPE avx2}
+  {$H+}
+  {$M-}
+{$ifdef fpc}
+
+
+  {$ModeSwitch typehelpers}
+  {$ModeSwitch advancedrecords}
+  {$inline on}
+  {$SafeFPUExceptions OFF}
+{$endif}
+
 {.$define USE_THREADS}
 {.$define USE_GPU}
 {.$define USE_AVX2}
@@ -280,7 +282,7 @@ type
     function ToWords:TWordDynArray;
     function ToLongWords:TLongWordDynArray;
     function ToQWords:TQWordDynArray;
-    generic function ToType<T>(const Conv:{$ifdef fpc}specialize{$endif} TConvertCallback<string,T>):{$ifdef fpc}specialize{$endif} TArray<T>;
+    {$ifdef fpc}generic{$endif} function ToType<T>(const Conv:{$ifdef fpc}specialize{$endif} TConvertCallback<string,T>):{$ifdef fpc}specialize{$endif} TArray<T>;
     class function cmp(const a, b: string): integer; static;inline;
     class function cmpText(const a, b: string): integer; static;inline;
     class function Every(const dst:PString; const aCount:integer;const func:{$ifdef fpc}specialize{$endif} TFilterCallback<string,PString>):boolean; static;inline;overload;
@@ -345,7 +347,8 @@ type
     procedure SetCount(AValue: integer);
   public
     function reduce(func:{$ifdef fpc}specialize{$endif} TReduceCallback<TType>;const init:TType):TType;   overload;
-    function reduce(func:{$ifdef fpc}specialize{$endif} TSimpleReduceCallback<TType>):TType;                         overload;
+    function reduce(func:{$ifdef fpc}specialize{$endif} TSimpleReduceCallback<TType>):TType;        overload;
+    function Reduce(func:{$ifdef fpc}specialize{$endif} TReduceCallback<TType>):TType; overload;//  _SIMPLEREDUCE_;
     function Sort(const Descending:boolean=false; CompareFunc:TCompare= nil):TSelf;
     function Sorted(const Descending:boolean=false; CompareFunc:TCompare= nil):TSelf;
     function Lookup(const val:TType):integer;
@@ -355,7 +358,7 @@ type
     function Filter(func:{$ifdef fpc}specialize{$endif} TFilterCallback<TType, PType>):TSelf;
     function unique():TSelf;
     property Count:integer read GetCount write SetCount;
-    // heap operations are costy use carfully
+    // heap operations are costy use, carfully
     function Push(v:TType):TType;
     function Pop():TType;
     function UnShift(v:TType):TType;
@@ -579,12 +582,12 @@ begin
   result:={$ifdef fpc}specialize{$endif} _BinSearch<TK,PK>(Keys,key,Length(Keys))>=0;
 end;
 
-function TSortedKeyValueList.IndexOfKey(const Key: TK): integer;
+function TSortedKeyValueList{$ifndef fpc}<TK,TV>{$endif}.IndexOfKey(const Key: TK): integer;
 begin
   result:={$ifdef fpc}specialize{$endif} _BinSearch<TK,PK>(Keys,key,Length(Keys));
 end;
 
-function TSortedKeyValueList.IndexOfValue(const AValue: TV): integer;
+function TSortedKeyValueList{$ifndef fpc}<TK,TV>{$endif}.IndexOfValue(const AValue: TV): integer;
 var i:integer;
 begin
   result:=-1;
@@ -603,7 +606,7 @@ begin
     end;
 end;
 
-function TSortedKeyValueList.AddOrUpdate(const Key: TK; const AValue: TV): integer;
+function TSortedKeyValueList{$ifndef fpc}<TK,TV>{$endif}.AddOrUpdate(const Key: TK; const AValue: TV): integer;
 var i:integer;
 begin
   i:={$ifdef fpc}specialize{$endif} _BinSearch<TK,PK>(Keys,key,Length(Keys));
@@ -643,6 +646,15 @@ function TVariantArrayHelper.reduce(func:{$ifdef fpc}specialize{$endif} TSimpleR
 //
 //end;
 //
+function TVariantArrayHelper.Reduce(func:{$ifdef fpc}specialize{$endif} TReduceCallback<TType>):TType;//  _SIMPLEREDUCE_;
+var i:integer;
+begin
+  if High(Self)>-1 then
+    result:=Self[0];
+  for i:=1 to high(self) do
+    result:=func(result,Self[i],i,Self)
+end;
+
 function TVariantArrayHelper.Sort(const Descending:boolean; CompareFunc:TCompare):TSelf;   _DOSORT_;
 //begin
 //

@@ -1,6 +1,9 @@
 unit ArrayHelperCommon;
+{$H+}
+{$ifdef fpc}
+{$ModeSwitch nestedprocvars}
+{$endif}
 
-{$mode objfpc}{$H+} {$ModeSwitch nestedprocvars}
 
 interface
 
@@ -16,9 +19,9 @@ type
   TInt64ArrayArray=array of TInt64DynArray;
   TSingleArrayArray=array of TSingleDynArray;
   TDoubleArrayArray=array of TDoubleDynArray;
-  TExtendedArrayArray=array of TExtendedDynArray;
-  TCurrencyArrayArray=array of TCurrencyArray;
-  TCompArrayArray=array of TCompDynArray;
+//  TExtendedArrayArray=array of TExtendedDynArray;
+//  TCurrencyArrayArray=array of TCurrencyArray;
+//  TCompArrayArray=array of TCompDynArray;
   TStringArrayArray=array of TStringDynArray;
 
   //TProcData=procedure(const opt:pointer;const Id, Stride,Count:integer);
@@ -41,7 +44,7 @@ type
   {$ifdef fpc}generic{$endif} TMapCallBackR<T,R>=function (const a:T;i:Integer;Arr:array of T):R;
   {$ifdef fpc}generic{$endif} TMapCallBack2<T>=function (const a:T;i:Integer;Arr:array of T):Double;
   {$ifdef fpc}generic{$endif} TSimpleMapCallback<T>=function (a:T):T;
-  {$ifdef fpc}generic{$endif} TSimpleMapCallbackNested<T>=function (a:T):T is Nested;
+  {$ifdef fpc}generic{$endif} TSimpleMapCallbackNested<T>=function (a:T):T;
   {$ifdef fpc}generic{$endif} TConvertCallback<T,R>=function (const a:T):R;
   {$ifdef fpc}generic{$endif} TSimpleFilterCallback<T>=function (const a:T):boolean;
   {$ifdef fpc}generic{$endif} TSimpleFilterCallbackNested<T>=function (const a:T):boolean is Nested;
@@ -52,16 +55,28 @@ type
   {$ifdef fpc}generic{$endif} TFilterCallbackNested<T,PT>=function (const a:T;const i:Integer; Arr:PT):boolean is nested;
   TMapCallbackSingle={$ifdef fpc}specialize{$endif} TMapCallback<Single>;
   TMapCallbackDouble={$ifdef fpc}specialize{$endif} TMapCallback<Double>;
+
+
+
   {$ifdef fpc}generic{$endif} function _Compare<T>(const a,b:T):integer;
   {$ifdef fpc}generic{$endif} function _BinSearch<T,PT>(const Arr:PT;const Val:T; R:integer; const Compare:{$ifdef fpc}specialize{$endif} TComparefunc<T>):integer;          overload;
   {$ifdef fpc}generic{$endif} function _BinSearch<T,PT>(const Arr:PT;const Val:T; R:integer; Compare:{$ifdef fpc}specialize{$endif} TComparefuncNested<T> =nil):integer;     overload;
   {$ifdef fpc}generic{$endif} procedure _QuickSort<T,PT>(const Arr: PT; L, R : Longint;const Descending:boolean; const Compare: {$ifdef fpc}specialize{$endif} TComparefunc<T>); inline ;
   {$ifdef fpc}generic{$endif} procedure _Reverse<T,PT>(const Arr: PT; const aCount: Longint); inline ;
+  {$ifdef fpc}generic{$endif} function windowHamming<T>(const a:T;const i:integer;Arr:array of T):T;
+  {$ifdef fpc}generic{$endif} function windowGaussian<T>(const a:T;const i:integer;Arr:array of T):T;
+  {$ifdef fpc}generic{$endif} function windowConfinedGaussian<T>(const a:T;const i:integer;Arr:array of T):T;
+  {$ifdef fpc}generic{$endif} function windowKaiser<T>(const a:T;const i:integer;Arr:array of T):T;
+  {$ifdef fpc}generic{$endif} function windowDolphChebyshev<T>(const a:T;const i:integer;Arr:array of T):T;
+
+
+  {$ifdef fpc}generic{$endif} procedure BitsShiftRight<PT>(const bits:PT; const offset,N:integer);
+  {$ifdef fpc}generic{$endif} procedure BitsReverse<T,PT>(const bits:PT; const padding, N : integer);
 
 const
   PIx2=3.1415926535897932384626433*2;
   Log2E=1.4426950408889634;
-  SqrtPIx2=sqrt(PIx2);
+  SqrtPIx2=2.5066282746310005024157652515873;//sqrt(PIx2);
   {$if defined(USE_AVX2)}
   DFTThreshold=$20;
 
@@ -71,11 +86,6 @@ const
 { some window functions :  https://en.wikipedia.org/wiki/Window_function }
 function windowHannSingle(const a:Single;const i:integer;Arr:array of Single):Single;
 function windowHammingSingle(const a:Single;const i:integer;Arr:array of Single):Single;
-{$ifdef fpc}generic{$endif} function windowHamming<T>(const a:T;const i:integer;Arr:array of T):T;
-{$ifdef fpc}generic{$endif} function windowGaussian<T>(const a:T;const i:integer;Arr:array of T):T;
-{$ifdef fpc}generic{$endif} function windowConfinedGaussian<T>(const a:T;const i:integer;Arr:array of T):T;
-{$ifdef fpc}generic{$endif} function windowKaiser<T>(const a:T;const i:integer;Arr:array of T):T;
-{$ifdef fpc}generic{$endif} function windowDolphChebyshev<T>(const a:T;const i:integer;Arr:array of T):T;
 const
 {$ifdef USE_AVX2}
    useAVX2:boolean=true;
@@ -93,19 +103,19 @@ function CountTrailingZeros( x:UInt32):integer;
 function CountBitsSet(x:UInt32):integer;
 function BitReverse(x:Uint32):UInt32;
 function HighestBitSet(const x:Uint32):integer;
-{$ifdef fpc}generic{$endif} procedure BitsShiftRight<PT>(const bits:PT; const offset,N:integer);
-{$ifdef fpc}generic{$endif} procedure BitsReverse<T,PT>(const bits:PT; const padding, N : integer);
 
 implementation
 
 {$ifdef fpc}generic{$endif} function _Compare<T>(const a,b:T):integer;
 begin
+ {$ifdef fpc}
  result:=1;
  if a=b then
    result:=0
  else
    if a<b then
    result:=-1
+ {$endif}
    //result:=b-a
 end;
 
@@ -207,6 +217,7 @@ begin
   {$ifdef fpc}specialize{$endif} BitsShiftRight<PT>(bits, padding, N);
 end;
 
+
 function windowHammingSingle(const a:Single;const i:integer;Arr:array of Single):Single;
 const a0=25/46;a1=1-a0;
 var  N:integer;
@@ -229,6 +240,7 @@ begin
   N:=Length(Arr);
   result:=a*(a0-a1*cos(PIx2*i/N))
 end;
+
 {$ifdef fpc}generic{$endif} function windowGaussian<T>(const a:T;const i:integer;Arr:array of T):T;
 begin
   writeln('');

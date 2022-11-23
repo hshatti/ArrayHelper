@@ -1,11 +1,13 @@
 unit hirestimer;
-
-{$mode delphi}{$H+}{$W-}
+{$H+}{$W-}
+{$ifdef fpc}
+{$mode delphi}
+{$endif}
 {.$define USE_RDTSC}
 
 interface
 uses
-  Classes, SysUtils
+  Classes, SysUtils {$ifdef mswindows}{$ifndef USE_RDTSC}, windows{$endif}{$endif}
   //{$ifndef CPUX86_64}
   //  {$ERROR High resolution timer requires an intel compatible x86/64 CPU}
   //{$endif}
@@ -14,8 +16,10 @@ uses
 type
   { THighResTimer }
 
+
 {$ifdef unix}       // should work on darwin too!
   {.$linklib c}
+
   clockid_t=longint;
   timespec = record
     tv_sec: int64;
@@ -56,9 +60,9 @@ type
   strTimeError = 'cannot read OS time!, ErrorNo [%s]';
 
   function clock_gettime(clk_id : clockid_t; tp: ptimespec) : longint  ;cdecl; external;
+type
 {$endif}
 
-type
   THighResTimer=class
   type
   {$if defined(USE_RDTSC) and defined(CPUX86_64)}
@@ -80,17 +84,18 @@ type
     function CPUInfo(info:uInt32=0 {Default is CPU Highest Function and Manifacture Id }):TReg;
     {$elseif defined(unix)}
     FTimeSpec:TTimeSpec;
-    {$elseif defined(windows)}
+    {$elseif defined(mswindows)}
     FStartTick:Int64;
     FCPUSpeed:Int64;// in Ticks
     {$else}
-      {$ERROR I don't know what OS is this!}
+      {.$message fatal 'I dont know what OS is this!'}
+
     {$endif}
   public
     constructor Create;
-    function NanoSeconds:QWord;inline;
-    function MicroSeconds: QWord;inline;
-    function MilliSeconds: Double;inline;
+    function NanoSeconds:int64;inline;
+    function MicroSeconds: int64;inline;
+    function MilliSeconds: double;inline;
 
     {$if defined(USE_RDTSC) and defined(CPUX86_64)}
     function GetCPUTick:QWord;assembler;nostackframe;
@@ -99,21 +104,21 @@ type
     property CPUMaxSpeed:Qword read FCPUMaxSpeed;
     property CPUBusSpeed:Qword read FCPUBusSpeed;
     property CPUManifacturer:string read FCPUManifacturer;
-    {$elseif defined(windows)}
-    property CPUSpeed:QWord read FCPUSpeed;
+    {$elseif defined(MSwindows)}
+    property CPUSpeed:Int64 read FCPUSpeed;
     {$endif}
   end;
 
   { TProfiler }
   TProfiler=class
     LogStr:string;
-    m_Start,m_LastLog,m_Elapsed,m_LastSegment:QWord;
+    m_Start,m_LastLog,m_Elapsed,m_LastSegment:int64;
     m_segments  : array[0..$f] of int64;
     procedure Log(const str:string);          overload;
     procedure Log(const SegmentId:integer);   overload;
-    procedure LogSegments(const SegStrings:TStringArray);
+    procedure LogSegments(const SegStrings:array of string);
     procedure Start;
-    function Stop: QWord;
+    function Stop: int64;
   end;
 
 
@@ -155,16 +160,16 @@ begin
     FCPUSpeed:=MeasureCPUSpeed
   end;
 end;
-{$elseif defined(windows)}
+{$elseif defined(mswindows)}
 begin
-  QueryPerformanceFrequency(@FCPUSpeed);
+  QueryPerformanceFrequency( {$ifdef fpc}@{$endif}FCPUSpeed);
 end;
 {$else}
 begin
 end;
 {$endif}
 
-function THighResTimer.NanoSeconds: QWord;inline;
+function THighResTimer.NanoSeconds: int64;
 begin
   {$if defined(USE_RDTSC) and defined(CPUX86_64)}
   result:=trunc(1000*(GetCPUTick/FCPUSpeed));
@@ -172,13 +177,13 @@ begin
   if clock_gettime(THE_CLOCK,@FTimeSpec) <>0 then
     raise Exception.Createfmt(strTimeError,[SysErrorMessage(GetLastOSError)]);
   result:=FTimeSpec.tv_sec*1000000000 + FTimeSpec.tv_nsec;
-  {$elseif defined(windows)}
-  QueryPerformanceCounter(@FStartTick);
+  {$elseif defined(mswindows)}
+  QueryPerformanceCounter({$ifdef fpc}@{$endif}FStartTick);
   result:=FStartTick*1000000000 div FCPUSpeed
   {$endif}
 end;
 
-function THighResTimer.MicroSeconds: QWord;inline;
+function THighResTimer.MicroSeconds: int64;
 begin
   //Assert(FCPUSpeed>0,'Cannot dertermine the CPU Speed');
   {$if defined(USE_RDTSC) and defined(CPUX86_64)}
@@ -187,8 +192,8 @@ begin
   if clock_gettime(THE_CLOCK,@FTimeSpec) <>0 then
     raise Exception.Createfmt(strTimeError,[SysErrorMessage(GetLastOSError)]);
   result:=FTimeSpec.tv_sec*1000000 + FTimeSpec.tv_nsec div 1000;
-  {$elseif defined(windows)}
-  QueryPerformanceCounter(@FStartTick);
+  {$elseif defined(mswindows)}
+  QueryPerformanceCounter({$ifdef fpc}@{$endif}FStartTick);
   result:=FStartTick*1000000 div FCPUSpeed
   {$endif}
 end;
@@ -201,14 +206,14 @@ begin
   if clock_gettime(THE_CLOCK,@FTimeSpec) <>0 then
     raise Exception.Createfmt(strTimeError,[SysErrorMessage(GetLastOSError)]) ;
   result:=FTimeSpec.tv_sec*1000 + FTimeSpec.tv_nsec / 1000000;
-  {$elseif defined(windows)}
-  QueryPerformanceCounter(@FStartTick);
-  result:=FStartTick*1000/FCPUSpeed)
+  {$elseif defined(mswindows)}
+  QueryPerformanceCounter({$ifdef fpc}@{$endif}FStartTick);
+  result:=FStartTick*1000/FCPUSpeed
   {$endif}
 end;
 
 {$if defined(USE_RDTSC) and defined(CPUX86_64)}
-{$AsmMode intel}
+{$ifdef fpc}{$AsmMode intel}  {$endif}
 function THighResTimer.GetCPUTick: QWord; assembler;nostackframe;
 asm
     rdtsc
@@ -253,7 +258,7 @@ end;
 procedure TProfiler.Log(const str: string);
 begin
 
-   LogStr:=LogStr+format('Since Start[%3nms], Since LastLog[%3nms]: %s',[((HighResTimer.MicroSeconds - m_Start)/1000), (HighResTimer.MicroSeconds - m_LastLog)/1000, str])+LineEnding;
+   LogStr:=LogStr+format('Since Start[%3nms], Since LastLog[%3nms]: %s',[((HighResTimer.MicroSeconds - m_Start)/1000), (HighResTimer.MicroSeconds - m_LastLog)/1000, str])+sLineBreak;
    m_LastLog:=HighResTimer.MicroSeconds;
    m_LastSegment:=m_LastLog;
 end;
@@ -264,28 +269,30 @@ begin
   m_LastSegment:=HighResTimer.MicroSeconds;
 end;
 
-procedure TProfiler.LogSegments(const SegStrings: TStringArray);
-var i:integer;sm:Int64 =0 ;
+procedure TProfiler.LogSegments(const SegStrings: array of string);
+var i:integer;sm:Int64;
 begin
+  sm:=0;
   for i:=0 to High(SegStrings) do begin
-    LogStr:=Logstr+format(' +Segment summary : '+SegStrings[i]+' [%3nms]',[m_segments[i]/1000])+LineEnding;
+    LogStr:=Logstr+format(' +Segment summary : '+SegStrings[i]+' [%3nms]',[m_segments[i]/1000])+sLineBreak;
     sm :=sm+m_segments[i]
   end;
-  LogStr:=Logstr+format('-------------------------------------'+LineEnding+'Total Segments : [%3nms]',[sm/1000])+LineEnding;
+  LogStr:=Logstr+format('-------------------------------------'+sLineBreak+'Total Segments : [%3nms]',[sm/1000])+sLineBreak;
   m_LastSegment:=HighResTimer.MicroSeconds;
+  m_LastLog:=m_LastSegment;
 end;
 
 procedure TProfiler.Start;
 begin
   LogStr:='';
-  FillQWord(m_segments[0],length(m_segments),0);
+  FillChar(m_segments[0],length(m_segments)*SizeOf(Int64),0);
   m_Start:=HighResTimer.MicroSeconds;
   m_LastLog:=m_Start;
   m_LastSegment:=m_Start;
 end;
 
-function TProfiler.Stop:QWord;
-var m:QWord;
+function TProfiler.Stop:int64;
+var m:int64;
 begin
   m:=HighResTimer.MicroSeconds;
   m_Elapsed:=m - m_Start;
